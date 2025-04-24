@@ -2,8 +2,9 @@ import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UsersController } from './users/user.controller';
 import { UsersModule } from './users/user.module';
+import { AuthModule } from './auth/auth.module';
+// import { JwtStrategy } from './auth/jwt.strategy';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { UsersModule } from './users/user.module';
 
       inject: [ConfigService],
     }),
-    UsersModule
+    UsersModule,
+    AuthModule,
   ],
 
   providers: [AppService],
