@@ -4,12 +4,15 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  // dotenv.config();
+  const app = await NestFactory.create(AppModule, { cors: true });
+
+  app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
     .setTitle('Inventory Management API')
-    .setDescription('The backend api to connect with the Inventory Management app')
+    .setDescription(
+      'The backend api to connect with the Inventory Management app',
+    )
     .setVersion('1.0')
     .addTag('Inventory Management')
     .addBearerAuth()
