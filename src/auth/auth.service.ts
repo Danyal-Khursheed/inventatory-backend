@@ -58,9 +58,10 @@ export class AuthService {
       user: {
         id: userData.id,
         companyName: userData.companyName,
-        name: userData.name,
+        name: userData.fullName,
         email: userData.email,
         phoneNumber: userData.phoneNumber,
+        role: userData.role,
       },
       token: {
         token: accessToken,

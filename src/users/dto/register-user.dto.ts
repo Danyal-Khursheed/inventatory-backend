@@ -7,7 +7,7 @@ export class RegisterUserDto {
 
   @ApiProperty()
   @IsString()
-  name: string;
+  fullName: string;
 
   @ApiProperty()
   @IsEmail()
@@ -17,6 +17,10 @@ export class RegisterUserDto {
   @IsString()
   @MinLength(6)
   password: string;
+
+  @ApiProperty()
+  @IsString()
+  countryCode: string;
 
   @ApiProperty()
   @IsString()
