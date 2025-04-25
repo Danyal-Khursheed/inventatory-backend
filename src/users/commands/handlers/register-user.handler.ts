@@ -29,6 +29,7 @@ export class CreateUserHandler implements ICommandHandler<RegisterUserCommand> {
 
     const user = this.userRepository.create({
       ...dto,
+      role: 'user',
       password: hashedPassword,
     });
     await this.userRepository.save(user);
