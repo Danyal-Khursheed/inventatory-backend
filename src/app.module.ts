@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/user.module';
 import { AuthModule } from './auth/auth.module';
-// import { JwtStrategy } from './auth/jwt.strategy';
 
 @Module({
   imports: [
