@@ -12,6 +12,8 @@ import { Headers } from '@nestjs/common';
 import { ForgotPasswordCommand } from './commands/impl/forgot-password.command';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResetPasswordCommand } from './commands/impl/reset-password.command';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -30,6 +32,7 @@ export class UsersController {
   }
 
   @Public()
+  @ApiExcludeEndpoint()
   @Post('post-registration-login')
   async postRegistrationLogin(
     @Body('email') email: string,
@@ -48,9 +51,9 @@ export class UsersController {
 
   @Public()
   @Post('forgot-password')
-  async forgotPassword(@Body('email') email: string) {
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
     const result = await this.commandBus.execute(
-      new ForgotPasswordCommand(email),
+      new ForgotPasswordCommand(dto.email),
     );
     return {
       message: 'OTP generated successfully',
