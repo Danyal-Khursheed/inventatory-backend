@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BadRequestException } from '@nestjs/common';
 import { RegisterUserCommand } from '../impl/register-user.command';
-import { UserEntity } from 'src/users/entity/users.entity';
+import { UserEntity } from 'src/users/entities/users.entity';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from 'src/auth/auth.service';
 

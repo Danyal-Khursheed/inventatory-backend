@@ -15,6 +15,7 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { UpdateUserCommand } from './commands/impl/update-user.command';
 import { DeleteUserCommand } from './commands/impl/delete-user.command';
 import { GetAllUsersQuery } from './queries/impl/get-all-users.query';
+import { GetUserQuery } from './queries/impl/get-single-user.query';
 
 @Controller('dashboardUsers')
 export class DashboardUsersController {
@@ -25,8 +26,14 @@ export class DashboardUsersController {
 
   @Public()
   @Get('/get-all-users')
-  async getAllUser(): Promise<any> {
+  async getAllUsers(): Promise<any> {
     return await this.queryBus.execute(new GetAllUsersQuery());
+  }
+
+  @Public()
+  @Get(':id')
+  async getUserById(@Param('id') id: string): Promise<any> {
+    return await this.queryBus.execute(new GetUserQuery(id));
   }
 
   @Public()

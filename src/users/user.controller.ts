@@ -1,18 +1,18 @@
 import { Body, Controller, Post, Request } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { RegisterUserDto } from './dto/register-user.dto';
+import { RegisterUserDto } from './dtos/register-user.dto';
 import { RegisterUserCommand } from './commands/impl/register-user.command';
-import { LoginUserDto } from './dto/login_user.dto';
+import { LoginUserDto } from './dtos/login_user.dto';
 import { LoginUserCommand } from './commands/impl/login-user.command';
 import { Public, RequestWithUser } from 'src/auth/auth.guard';
 import { PostRegistrationLoginCommand } from './commands/impl/post-registration-login.command';
 import { UnauthorizedException } from '@nestjs/common';
 import { Headers } from '@nestjs/common';
 import { ForgotPasswordCommand } from './commands/impl/forgot-password.command';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { ResetPasswordCommand } from './commands/impl/reset-password.command';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 
 @Controller('users')
 export class UsersController {

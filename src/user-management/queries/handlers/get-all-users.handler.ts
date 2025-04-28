@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetAllUsersQuery } from '../impl/get-all-users.query';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from 'src/users/entity/users.entity';
+import { UserEntity } from 'src/users/entities/users.entity';
 import { Repository } from 'typeorm';
 
 @QueryHandler(GetAllUsersQuery)
@@ -14,7 +14,7 @@ export class GetAllUsersQueryHandle implements IQueryHandler<GetAllUsersQuery> {
   async execute(): Promise<Partial<UserEntity>[]> {
     return (await this.usersRepository.find()).map((u) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...rest } = u;
+      const { password, refreshToken, ...rest } = u;
       return rest;
     });
   }
