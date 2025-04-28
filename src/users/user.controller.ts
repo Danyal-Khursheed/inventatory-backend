@@ -5,7 +5,7 @@ import { RegisterUserCommand } from './commands/impl/register-user.command';
 import { DeleteUserCommand } from './commands/impl/delete-user.command';
 import { LoginUserDto } from './dto/login_user.dto';
 import { LoginUserCommand } from './commands/impl/login-user.command';
-import { JwtPayload, Public } from 'src/auth/auth.guard';
+import { Public, RequestWithUser } from 'src/auth/auth.guard';
 import { PostRegistrationLoginCommand } from './commands/impl/post-registration-login.command';
 import { UnauthorizedException } from '@nestjs/common';
 import { Headers } from '@nestjs/common';
@@ -52,9 +52,8 @@ export class UsersController {
   @Public()
   @Post('forgot-password')
   async forgotPassword(@Body() dto: ForgotPasswordDto) {
-    const result = await this.commandBus.execute(
-      new ForgotPasswordCommand(dto.email),
-    );
+    const result: { otp: string; token: string } =
+      await this.commandBus.execute(new ForgotPasswordCommand(dto.email));
     return {
       message: 'OTP generated successfully',
       otp: result.otp,
@@ -63,8 +62,11 @@ export class UsersController {
   }
 
   @Post('reset-password')
-  async resetPassword(@Body() data: ResetPasswordDto, @Request() req) {
-    const { id } = req.user as JwtPayload;
+  async resetPassword(
+    @Body() data: ResetPasswordDto,
+    @Request() req: RequestWithUser,
+  ): Promise<any> {
+    const { id } = req.user;
     return await this.commandBus.execute(
       new ResetPasswordCommand(id, data.otp, data.newPassword),
     );
