@@ -3,8 +3,8 @@ import { ResetPasswordCommand } from '../impl/reset-password.command';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from 'src/users/entity/users.entity';
-import { OtpEntity } from 'src/users/entity/otp.entity';
+import { UserEntity } from 'src/users/entities/users.entity';
+import { OtpEntity } from 'src/users/entities/otp.entity';
 import * as bcrypt from 'bcrypt';
 
 @CommandHandler(ResetPasswordCommand)
