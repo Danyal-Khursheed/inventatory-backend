@@ -1,6 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserHandler } from './register-user.handler';
-import { DeleteUserHandler } from './delete-user.handler';
 import { LoginUserHandler } from './login-user.handler';
 import { AuthService } from 'src/auth/auth.service';
 import { PostRegistrationLoginHandler } from './post-registration-login.handler';
@@ -9,7 +8,6 @@ import { ResetPasswordHandler } from './reset-password.handler';
 
 export default [
   CreateUserHandler,
-  DeleteUserHandler,
   LoginUserHandler,
   PostRegistrationLoginHandler,
   ForgotPasswordHandler,
