@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/users/entity/users.entity';
+import { JwtPayload } from 'src/auth/auth.guard';
 
 @CommandHandler(PostRegistrationLoginCommand)
 export class PostRegistrationLoginHandler
@@ -20,9 +21,10 @@ export class PostRegistrationLoginHandler
     const { email, registrationToken } = command;
 
     try {
-      const payload = this.jwtService.verify(registrationToken, {
-        secret: process.env.JWT_SECRET,
-      });
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(
+        registrationToken,
+        { secret: process.env.JWT_SECRET },
+      );
 
       if (!payload || payload.email !== email) {
         throw new UnauthorizedException('Invalid registration token');
@@ -51,7 +53,7 @@ export class PostRegistrationLoginHandler
         },
       };
     } catch (error) {
-      throw new UnauthorizedException('Invalid or expired token');
+      throw new UnauthorizedException(error || 'Invalid or expired token');
     }
   }
 }
