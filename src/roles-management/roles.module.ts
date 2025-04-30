@@ -3,14 +3,19 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import commandHandlers from './commands/handlers';
 import { RolesEntity } from './entities/create-role.entity';
-import { RolesPermsMappingEntity } from './entities/roles-perms-mapping.entity';
+import { RolePermissionEntity } from './entities/role-permissions.entity';
 import { RolesController } from './roles.controller';
 import { GetAllRolesQueryHandle } from './queries/handlers/get-all-roles.handler';
+import { PermissionEntity } from 'src/permissions-management/entity/permissions.entity';
 
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([RolesEntity, RolesPermsMappingEntity]),
+    TypeOrmModule.forFeature([
+      RolesEntity,
+      RolePermissionEntity,
+      PermissionEntity,
+    ]),
   ],
   controllers: [RolesController],
   providers: [...commandHandlers, GetAllRolesQueryHandle],

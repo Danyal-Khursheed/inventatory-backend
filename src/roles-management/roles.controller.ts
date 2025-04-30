@@ -46,8 +46,8 @@ export class RolesController {
     );
   }
 
-  @Delete(':roleId')
-  async deleteRole(@Param('roleId') roleId: string): Promise<any> {
-    return await this.commandBus.execute(new DeleteRoleCommand(roleId));
+  @Delete(':id')
+  async deleteRole(@Param('id') id: string): Promise<any> {
+    return await this.commandBus.execute(new DeleteRoleCommand(id));
   }
 }

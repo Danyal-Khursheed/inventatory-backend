@@ -4,7 +4,9 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { RolePermissionEntity } from './role-permissions.entity';
 @Entity('roles')
 export class RolesEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -15,6 +17,9 @@ export class RolesEntity {
 
   @Column()
   description: string;
+
+  @OneToMany(() => RolePermissionEntity, (rp) => rp.role)
+  rolePermissions: RolePermissionEntity[];
 
   @CreateDateColumn()
   createdAt: Date;
