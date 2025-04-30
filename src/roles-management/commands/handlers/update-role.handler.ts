@@ -1,45 +1,74 @@
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
 import { UpdateRoleCommand } from '../impl/update-role.command';
 import { RolesEntity } from 'src/roles-management/entities/create-role.entity';
-import { RolesPermsMappingEntity } from 'src/roles-management/entities/roles-perms-mapping.entity';
+import { RolePermissionEntity } from 'src/roles-management/entities/role-permissions.entity';
+import { PermissionEntity } from 'src/permissions-management/entity/permissions.entity';
+import { PermissionGroup } from 'src/roles-management/dtos/create-role.dto';
 
 @CommandHandler(UpdateRoleCommand)
 export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand> {
   constructor(
     @InjectRepository(RolesEntity)
-    private readonly rolesRepository: Repository<RolesEntity>,
-
-    @InjectRepository(RolesPermsMappingEntity)
-    private readonly rolePermRepo: Repository<RolesPermsMappingEntity>,
+    private readonly rolesRepo: Repository<RolesEntity>,
+    @InjectRepository(PermissionEntity)
+    private readonly permissionRepo: Repository<PermissionEntity>,
+    @InjectRepository(RolePermissionEntity)
+    private readonly rolePermRepo: Repository<RolePermissionEntity>,
   ) {}
 
-  async execute(command: UpdateRoleCommand): Promise<any> {
-    const { roleId, roleName, description, permissions } = command;
-
-    const existingRole = await this.rolesRepository.findOne({
-      where: { id: roleId },
-    });
-    if (!existingRole) {
+  async execute({
+    roleId,
+    roleName,
+    description,
+    permissions,
+  }: UpdateRoleCommand) {
+    const role = await this.rolesRepo.findOne({ where: { id: roleId } });
+    if (!role)
       throw new NotFoundException(`Role with ID "${roleId}" not found.`);
-    }
 
-    existingRole.roleName = roleName;
-    existingRole.description = description;
-    await this.rolesRepository.save(existingRole);
+    role.roleName = roleName;
+    role.description = description;
+    const updatedRole = await this.rolesRepo.save(role);
 
-    const existingMapping = await this.rolePermRepo.findOne({
-      where: { roleId },
-    });
-    if (existingMapping) {
-      existingMapping.roleName = roleName;
-      existingMapping.description = description;
-      existingMapping.permissions = permissions;
-      await this.rolePermRepo.save(existingMapping);
-    }
+    await this.rolePermRepo.delete({ role: { id: roleId } });
+
+    const rolePermissions = await this.buildRolePermissions(
+      updatedRole,
+      permissions,
+    );
+    if (rolePermissions.length) await this.rolePermRepo.save(rolePermissions);
 
     return { success: true, message: 'Role Updated Successfully' };
+  }
+
+  private async buildRolePermissions(
+    role: RolesEntity,
+    permissions: PermissionGroup[],
+  ) {
+    const result: RolePermissionEntity[] = [];
+
+    for (const group of permissions) {
+      for (const [permName, actions] of Object.entries(group)) {
+        const permission = await this.permissionRepo.findOne({
+          where: { permission: permName },
+        });
+        if (!permission)
+          throw new NotFoundException(`Permission "${permName}" not found.`);
+
+        const invalid = actions.filter((a) => !permission.actions.includes(a));
+        if (invalid.length) {
+          throw new BadRequestException(
+            `Invalid actions [${invalid.join(', ')}] for "${permName}". Valid: [${permission.actions.join(', ')}]`,
+          );
+        }
+
+        result.push(this.rolePermRepo.create({ role, permission, actions }));
+      }
+    }
+
+    return result;
   }
 }
