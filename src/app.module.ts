@@ -5,6 +5,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/user.module';
 import { AuthModule } from './auth/auth.module';
 import { DashboardUsersModule } from './user-management/dashboard-users.module';
+import { RolesModule } from './roles-management/roles.module';
+import { PermissionsModule } from './permissions-management/permissions.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { DashboardUsersModule } from './user-management/dashboard-users.module';
     UsersModule,
     AuthModule,
     DashboardUsersModule,
+    RolesModule,
+    PermissionsModule,
   ],
 
   providers: [AppService],
