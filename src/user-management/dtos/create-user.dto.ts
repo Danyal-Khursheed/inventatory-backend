@@ -20,4 +20,8 @@ export class CreateUserDto {
   @ApiProperty()
   @IsString()
   phoneNumber: string;
+
+  @ApiProperty()
+  @IsString()
+  role?: string;
 }

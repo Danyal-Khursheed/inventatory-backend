@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -24,8 +25,14 @@ export class DashboardUsersController {
   ) {}
 
   @Get('/get-all-users')
-  async getAllUsers(): Promise<any> {
-    return await this.queryBus.execute(new GetAllUsersQuery());
+  async getAllUsers(
+    @Query('pageNumber') pageNumber: number,
+    @Query('pageSize') pageSize: number,
+    @Query('searchTerm') searchTerm?: string,
+  ): Promise<any> {
+    return await this.queryBus.execute(
+      new GetAllUsersQuery(pageNumber, pageSize, searchTerm),
+    );
   }
 
   @Get(':id')

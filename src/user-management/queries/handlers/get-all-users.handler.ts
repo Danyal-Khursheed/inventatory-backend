@@ -12,13 +12,21 @@ export class GetAllUsersQueryHandle implements IQueryHandler<GetAllUsersQuery> {
   ) {}
 
   async execute(query: GetAllUsersQuery): Promise<any> {
-    const { pageNumber, pageSize } = query;
+    const { pageNumber, pageSize, searchTerm } = query;
 
-    const [users, totalCount] = await this.usersRepository.findAndCount({
-      skip: (pageNumber - 1) * pageSize,
-      take: pageSize,
-      order: { createdAt: 'DESC' },
-    });
+    const qb = this.usersRepository.createQueryBuilder('user');
+
+    if (searchTerm) {
+      qb.where('user.fullName ILIKE :search OR user.email ILIKE :search', {
+        search: `%${searchTerm}%`,
+      });
+    }
+
+    const [users, totalCount] = await qb
+      .skip((pageNumber - 1) * pageSize)
+      .take(pageSize)
+      .orderBy('user.createdAt', 'DESC')
+      .getManyAndCount();
 
     const sanitizedUsers = users.map((u) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -29,8 +37,8 @@ export class GetAllUsersQueryHandle implements IQueryHandler<GetAllUsersQuery> {
     return {
       data: sanitizedUsers,
       totalCount,
-      pageNumber,
-      pageSize,
+      pageNumber: Number(pageNumber),
+      pageSize: Number(pageSize),
     };
   }
 }
