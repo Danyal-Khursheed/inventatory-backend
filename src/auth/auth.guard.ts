@@ -17,7 +17,7 @@ export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
 export interface JwtPayload {
   id: string;
-  companyName: string;
+  companyId: string;
   fullName: string;
   email: string;
   role: string;

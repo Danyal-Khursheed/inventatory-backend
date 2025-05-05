@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  Request,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -16,6 +17,7 @@ import { UpdateUserCommand } from './commands/impl/update-user.command';
 import { DeleteUserCommand } from './commands/impl/delete-user.command';
 import { GetAllUsersQuery } from './queries/impl/get-all-users.query';
 import { GetUserQuery } from './queries/impl/get-single-user.query';
+import { RequestWithUser } from 'src/auth/auth.guard';
 
 @Controller('dashboardUsers')
 export class DashboardUsersController {
@@ -26,12 +28,14 @@ export class DashboardUsersController {
 
   @Get('/get-all-users')
   async getAllUsers(
+    @Request() req: RequestWithUser,
     @Query('pageNumber') pageNumber: number,
     @Query('pageSize') pageSize: number,
     @Query('searchTerm') searchTerm?: string,
   ): Promise<any> {
+    const { role, companyId } = req.user;
     return await this.queryBus.execute(
-      new GetAllUsersQuery(pageNumber, pageSize, searchTerm),
+      new GetAllUsersQuery(role, companyId, pageNumber, pageSize, searchTerm),
     );
   }
 

@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { DashboardUsersModule } from './user-management/dashboard-users.module';
 import { RolesModule } from './roles-management/roles.module';
 import { PermissionsModule } from './permissions-management/permissions.module';
+import { CompaniesModule } from './companies-management/companies.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { PermissionsModule } from './permissions-management/permissions.module';
     DashboardUsersModule,
     RolesModule,
     PermissionsModule,
+    CompaniesModule,
   ],
 
   providers: [AppService],

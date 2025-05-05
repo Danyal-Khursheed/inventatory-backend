@@ -4,14 +4,14 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { CompanyEntity } from 'src/companies-management/entity/create-company.entity';
 @Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column()
-  companyName: string;
 
   @Column()
   fullName: string;
@@ -33,6 +33,13 @@ export class UserEntity {
 
   @Column({ nullable: true })
   refreshToken: string;
+
+  @ManyToOne(() => CompanyEntity, (company) => company.users)
+  @JoinColumn({ name: 'companyId' })
+  company: CompanyEntity;
+
+  @Column({ nullable: true })
+  companyId: string;
 
   @CreateDateColumn()
   createdAt: Date;
