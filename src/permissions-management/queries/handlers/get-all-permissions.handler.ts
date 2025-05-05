@@ -13,9 +13,27 @@ export class GetAllPermissionsQueryHandler
     private readonly permissionRepo: Repository<PermissionEntity>,
   ) {}
 
-  async execute(): Promise<any[]> {
-    const permissions = await this.permissionRepo.find();
+  async execute(query: GetAllPermissionsQuery): Promise<any> {
+    const { pageNumber, pageSize } = query;
 
+    if (pageNumber && pageSize) {
+      const [data, totalCount] = await this.permissionRepo.findAndCount({
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+      });
+
+      return {
+        data: data.map((perm) => ({
+          permissionName: perm.permission,
+          actions: perm.actions,
+        })),
+        totalCount,
+        pageNumber,
+        pageSize,
+      };
+    }
+
+    const permissions = await this.permissionRepo.find();
     return permissions.map((perm) => ({
       permissionName: perm.permission,
       actions: perm.actions,

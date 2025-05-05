@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateRoleDto } from './dtos/create-role.dto';
@@ -23,8 +24,14 @@ export class RolesController {
   ) {}
 
   @Get()
-  async getAllRoles(): Promise<any> {
-    return await this.queryBus.execute(new GetAllRolesQuery());
+  async getAllRoles(
+    @Query('pageNumber') pageNumber?: string,
+    @Query('pageSize') pageSize?: string,
+  ): Promise<any> {
+    const page = pageNumber ? parseInt(pageNumber, 10) : undefined;
+    const size = pageSize ? parseInt(pageSize, 10) : undefined;
+
+    return this.queryBus.execute(new GetAllRolesQuery(page, size));
   }
 
   @Post('create-role')

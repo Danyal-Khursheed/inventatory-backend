@@ -11,35 +11,35 @@ export class GetAllRolesQueryHandle implements IQueryHandler<GetAllRolesQuery> {
     private rolesRepo: Repository<RolesEntity>,
   ) {}
 
-  async execute(query: GetAllRolesQuery): Promise<any> {
-    const { pageNumber, pageSize } = query;
+  async execute({ pageNumber, pageSize }: GetAllRolesQuery): Promise<any> {
+    const isPaginated = !!(pageNumber && pageSize);
 
-    const [roles, totalCount] = await this.rolesRepo.findAndCount({
-      skip: (pageNumber - 1) * pageSize,
-      take: pageSize,
-      order: { createdAt: 'DESC' },
-      relations: ['rolePermissions', 'rolePermissions.permission'],
-    });
+    if (isPaginated) {
+      const [roles, totalCount] = await this.rolesRepo.findAndCount({
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+        order: { createdAt: 'DESC' },
+        relations: ['rolePermissions', 'rolePermissions.permission'],
+      });
 
-    const formattedRoles = roles.map((role) => {
-      const permissions = role.rolePermissions.map((rp) => ({
-        permissionName: rp.permission.permission,
-        actions: rp.actions,
-      }));
-
-      return {
+      const data = roles.map((role) => ({
         id: role.id,
         roleName: role.roleName,
         description: role.description,
-        permissions: permissions,
-      };
+        permissions: role.rolePermissions.map((rp) => ({
+          permissionName: rp.permission.permission,
+          actions: rp.actions,
+        })),
+      }));
+
+      return { data, totalCount, pageNumber, pageSize };
+    }
+
+    const roles = await this.rolesRepo.find({
+      order: { createdAt: 'DESC' },
+      select: ['id', 'roleName'],
     });
 
-    return {
-      data: formattedRoles,
-      totalCount,
-      pageNumber,
-      pageSize,
-    };
+    return { data: roles };
   }
 }

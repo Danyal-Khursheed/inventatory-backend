@@ -41,7 +41,6 @@ export class PostRegistrationLoginHandler
       return {
         user: {
           id: userData.id,
-          companyName: userData.companyName,
           name: userData.fullName,
           email: userData.email,
           phoneNumber: userData.phoneNumber,

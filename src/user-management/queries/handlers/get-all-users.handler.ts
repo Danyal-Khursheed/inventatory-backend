@@ -12,25 +12,40 @@ export class GetAllUsersQueryHandle implements IQueryHandler<GetAllUsersQuery> {
   ) {}
 
   async execute(query: GetAllUsersQuery): Promise<any> {
-    const { pageNumber, pageSize } = query;
+    const { role, companyId, pageNumber, pageSize, searchTerm } = query;
 
-    const [users, totalCount] = await this.usersRepository.findAndCount({
-      skip: (pageNumber - 1) * pageSize,
-      take: pageSize,
-      order: { createdAt: 'DESC' },
-    });
+    const qb = this.usersRepository.createQueryBuilder('user');
 
-    const sanitizedUsers = users.map((u) => {
+    if (role !== 'super-admin') {
+      qb.where('user.companyId = :companyId', { companyId });
+    }
+
+    if (searchTerm) {
+      const searchCondition =
+        '(user.fullName ILIKE :search OR user.email ILIKE :search)';
+      if (role !== 'super-admin') {
+        qb.andWhere(searchCondition, { search: `%${searchTerm}%` });
+      } else {
+        qb.where(searchCondition, { search: `%${searchTerm}%` });
+      }
+    }
+
+    const [users, totalCount] = await qb
+      .skip((pageNumber - 1) * pageSize)
+      .take(pageSize)
+      .orderBy('user.createdAt', 'DESC')
+      .getManyAndCount();
+
+    const sanitizedUsers = users.map(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, refreshToken, ...rest } = u;
-      return rest;
-    });
+      ({ password, refreshToken, ...rest }) => rest,
+    );
 
     return {
       data: sanitizedUsers,
       totalCount,
-      pageNumber,
-      pageSize,
+      pageNumber: Number(pageNumber),
+      pageSize: Number(pageSize),
     };
   }
 }
