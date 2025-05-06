@@ -17,7 +17,7 @@ import { UpdateUserCommand } from './commands/impl/update-user.command';
 import { DeleteUserCommand } from './commands/impl/delete-user.command';
 import { GetAllUsersQuery } from './queries/impl/get-all-users.query';
 import { GetUserQuery } from './queries/impl/get-single-user.query';
-import { RequestWithUser } from 'src/auth/auth.guard';
+import { Public, RequestWithUser } from 'src/auth/auth.guard';
 
 @Controller('dashboardUsers')
 export class DashboardUsersController {
@@ -44,6 +44,7 @@ export class DashboardUsersController {
     return await this.queryBus.execute(new GetUserQuery(id));
   }
 
+  @Public()
   @Post('create-user')
   async createUser(@Body() data: CreateUserDto): Promise<any> {
     return await this.commandBus.execute(new CreateUserCommand(data));
