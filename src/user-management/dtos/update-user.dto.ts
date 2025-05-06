@@ -7,10 +7,6 @@ export class UpdateUserDto {
 
   @ApiProperty()
   @IsString()
-  companyName: string;
-
-  @ApiProperty()
-  @IsString()
   fullName: string;
 
   @ApiProperty()
@@ -24,8 +20,4 @@ export class UpdateUserDto {
   @ApiProperty()
   @IsString()
   phoneNumber: string;
-
-  @ApiProperty()
-  @IsString()
-  role: string;
 }

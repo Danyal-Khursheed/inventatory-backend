@@ -16,14 +16,14 @@ export class GetAllUsersQueryHandle implements IQueryHandler<GetAllUsersQuery> {
 
     const qb = this.usersRepository.createQueryBuilder('user');
 
-    if (role !== 'super-admin') {
+    if (role !== 'super_admin') {
       qb.where('user.companyId = :companyId', { companyId });
     }
 
     if (searchTerm) {
       const searchCondition =
         '(user.fullName ILIKE :search OR user.email ILIKE :search)';
-      if (role !== 'super-admin') {
+      if (role !== 'super_admin') {
         qb.andWhere(searchCondition, { search: `%${searchTerm}%` });
       } else {
         qb.where(searchCondition, { search: `%${searchTerm}%` });

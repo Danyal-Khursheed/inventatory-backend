@@ -13,6 +13,7 @@ import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { ResetPasswordCommand } from './commands/impl/reset-password.command';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { ForgotPasswordDto } from './dtos/forgot-password.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
 export class UsersController {
@@ -61,6 +62,7 @@ export class UsersController {
   }
 
   @Post('reset-password')
+  @ApiBearerAuth()
   async resetPassword(
     @Body() data: ResetPasswordDto,
     @Request() req: RequestWithUser,

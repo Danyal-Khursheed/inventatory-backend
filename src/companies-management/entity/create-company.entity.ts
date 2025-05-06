@@ -19,6 +19,21 @@ export class CompanyEntity {
   @Column({ type: 'varchar', length: 255 })
   companyName: string;
 
+  @Column({ nullable: true })
+  description: string;
+
+  @Column()
+  email: string;
+
+  @Column()
+  countryCode: string;
+
+  @Column()
+  phoneNumber: string;
+
+  @Column()
+  address: string;
+
   @OneToMany(() => UserEntity, (user) => user.company)
   users: UserEntity[];
 

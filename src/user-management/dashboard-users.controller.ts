@@ -8,6 +8,7 @@ import {
   Put,
   Query,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -17,7 +18,11 @@ import { UpdateUserCommand } from './commands/impl/update-user.command';
 import { DeleteUserCommand } from './commands/impl/delete-user.command';
 import { GetAllUsersQuery } from './queries/impl/get-all-users.query';
 import { GetUserQuery } from './queries/impl/get-single-user.query';
-import { Public, RequestWithUser } from 'src/auth/auth.guard';
+import { RequestWithUser } from 'src/auth/auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { RolesGuard } from 'src/middlewares/roles.gaurd';
+import { Roles } from 'src/middlewares/roles.decorator';
+import { Role } from 'src/middlewares/roles.enum';
 
 @Controller('dashboardUsers')
 export class DashboardUsersController {
@@ -27,6 +32,9 @@ export class DashboardUsersController {
   ) {}
 
   @Get('/get-all-users')
+  @Roles(Role.super_admin, Role.admin)
+  @UseGuards(RolesGuard)
+  @ApiBearerAuth()
   async getAllUsers(
     @Request() req: RequestWithUser,
     @Query('pageNumber') pageNumber: number,
@@ -40,22 +48,33 @@ export class DashboardUsersController {
   }
 
   @Get(':id')
+  @Roles(Role.super_admin, Role.admin)
+  @UseGuards(RolesGuard)
+  @ApiBearerAuth()
   async getUserById(@Param('id') id: string): Promise<any> {
     return await this.queryBus.execute(new GetUserQuery(id));
   }
 
-  @Public()
   @Post('create-user')
+  @Roles(Role.super_admin, Role.admin)
+  @UseGuards(RolesGuard)
+  @ApiBearerAuth()
   async createUser(@Body() data: CreateUserDto): Promise<any> {
     return await this.commandBus.execute(new CreateUserCommand(data));
   }
 
   @Put('update-user')
+  @Roles(Role.super_admin, Role.admin)
+  @UseGuards(RolesGuard)
+  @ApiBearerAuth()
   async updateUser(@Body() data: UpdateUserDto): Promise<any> {
     return await this.commandBus.execute(new UpdateUserCommand(data));
   }
 
   @Delete(':id')
+  @Roles(Role.super_admin, Role.admin)
+  @UseGuards(RolesGuard)
+  @ApiBearerAuth()
   async deleteUser(@Param('id') id: string): Promise<any> {
     return await this.commandBus.execute(new DeleteUserCommand(id));
   }

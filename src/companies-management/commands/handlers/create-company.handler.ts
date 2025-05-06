@@ -19,6 +19,11 @@ export class CreateCompanyHandler
     const company = this.companyRepository.create({
       logo: dto.logo,
       companyName: dto.companyName,
+      description: dto.description,
+      email: dto.email,
+      address: dto.address,
+      countryCode: dto.countryCode,
+      phoneNumber: dto.phoneNumber,
     });
 
     await this.companyRepository.save(company);

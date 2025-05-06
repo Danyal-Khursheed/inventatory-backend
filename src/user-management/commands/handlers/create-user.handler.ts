@@ -50,7 +50,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
     const user = this.userRepository.create({
       ...dto,
-      role: dto.role ?? 'user',
+      role: dto.role ?? 'admin',
       password: hashedPassword,
       companyId: company.id,
     });
