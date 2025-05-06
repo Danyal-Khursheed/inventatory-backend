@@ -4,7 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/user.module';
 import { AuthModule } from './auth/auth.module';
-// import { JwtStrategy } from './auth/jwt.strategy';
+import { DashboardUsersModule } from './user-management/dashboard-users.module';
+import { RolesModule } from './roles-management/roles.module';
+import { PermissionsModule } from './permissions-management/permissions.module';
+import { CompaniesModule } from './companies-management/companies.module';
 
 @Module({
   imports: [
@@ -26,6 +29,10 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     AuthModule,
+    DashboardUsersModule,
+    RolesModule,
+    PermissionsModule,
+    CompaniesModule,
   ],
 
   providers: [AppService],

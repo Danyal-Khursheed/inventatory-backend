@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { UserEntity } from 'src/users/entity/users.entity';
+import { UserEntity } from 'src/users/entities/users.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -21,12 +21,12 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Invalid email');
+      throw new UnauthorizedException('Invalid email or password');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid password');
+      throw new UnauthorizedException('Invalid email or password');
     }
 
     return this.generateTokens(user);
@@ -36,7 +36,10 @@ export class AuthService {
     const secret = this.configService.get<string>('JWT_SECRET');
     const payload = {
       id: user.id,
+      companyId: user.companyId,
+      fullName: user.fullName,
       email: user.email,
+      role: user.role,
     };
 
     const accessToken = this.jwtService.sign(payload, {
@@ -57,7 +60,6 @@ export class AuthService {
     return {
       user: {
         id: userData.id,
-        companyName: userData.companyName,
         name: userData.fullName,
         email: userData.email,
         phoneNumber: userData.phoneNumber,

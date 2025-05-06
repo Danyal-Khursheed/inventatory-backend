@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { UserEntity } from 'src/users/entity/users.entity';
+import { UserEntity } from 'src/users/entities/users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -17,10 +17,13 @@ export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
 export interface JwtPayload {
   id: string;
+  companyId: string;
+  fullName: string;
   email: string;
+  role: string;
 }
 
-interface RequestWithUser extends Request {
+export interface RequestWithUser extends Request {
   user: JwtPayload;
 }
 

@@ -1,17 +1,19 @@
-import { Body, Controller, Delete, Param, Post, Request } from '@nestjs/common';
+import { Body, Controller, Post, Request } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { RegisterUserDto } from './dto/register-user.dto';
+import { RegisterUserDto } from './dtos/register-user.dto';
 import { RegisterUserCommand } from './commands/impl/register-user.command';
-import { DeleteUserCommand } from './commands/impl/delete-user.command';
-import { LoginUserDto } from './dto/login_user.dto';
+import { LoginUserDto } from './dtos/login_user.dto';
 import { LoginUserCommand } from './commands/impl/login-user.command';
-import { JwtPayload, Public } from 'src/auth/auth.guard';
+import { Public, RequestWithUser } from 'src/auth/auth.guard';
 import { PostRegistrationLoginCommand } from './commands/impl/post-registration-login.command';
 import { UnauthorizedException } from '@nestjs/common';
 import { Headers } from '@nestjs/common';
 import { ForgotPasswordCommand } from './commands/impl/forgot-password.command';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { ResetPasswordCommand } from './commands/impl/reset-password.command';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { ForgotPasswordDto } from './dtos/forgot-password.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
 export class UsersController {
@@ -30,6 +32,7 @@ export class UsersController {
   }
 
   @Public()
+  @ApiExcludeEndpoint()
   @Post('post-registration-login')
   async postRegistrationLogin(
     @Body('email') email: string,
@@ -48,10 +51,9 @@ export class UsersController {
 
   @Public()
   @Post('forgot-password')
-  async forgotPassword(@Body('email') email: string) {
-    const result = await this.commandBus.execute(
-      new ForgotPasswordCommand(email),
-    );
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    const result: { otp: string; token: string } =
+      await this.commandBus.execute(new ForgotPasswordCommand(dto.email));
     return {
       message: 'OTP generated successfully',
       otp: result.otp,
@@ -60,15 +62,14 @@ export class UsersController {
   }
 
   @Post('reset-password')
-  async resetPassword(@Body() data: ResetPasswordDto, @Request() req) {
-    const { id } = req.user as JwtPayload;
+  @ApiBearerAuth()
+  async resetPassword(
+    @Body() data: ResetPasswordDto,
+    @Request() req: RequestWithUser,
+  ): Promise<any> {
+    const { id } = req.user;
     return await this.commandBus.execute(
       new ResetPasswordCommand(id, data.otp, data.newPassword),
     );
-  }
-
-  @Delete(':id')
-  async deleteUser(@Param('id') id: string): Promise<any> {
-    return await this.commandBus.execute(new DeleteUserCommand(id));
   }
 }
