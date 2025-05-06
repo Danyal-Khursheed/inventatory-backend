@@ -3,6 +3,7 @@ import { CreateCompanyCommand } from '../impl/create-company.command';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CompanyEntity } from 'src/companies-management/entity/create-company.entity';
+import { BadRequestException } from '@nestjs/common';
 
 @CommandHandler(CreateCompanyCommand)
 export class CreateCompanyHandler
@@ -15,6 +16,14 @@ export class CreateCompanyHandler
 
   async execute(command: CreateCompanyCommand): Promise<any> {
     const { dto } = command;
+
+    const existingCompany = await this.companyRepository.findOne({
+      where: { companyName: dto.companyName },
+    });
+
+    if (existingCompany) {
+      throw new BadRequestException('company with this name already exist');
+    }
 
     const company = this.companyRepository.create({
       logo: dto.logo,

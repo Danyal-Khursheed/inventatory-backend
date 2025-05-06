@@ -3,10 +3,6 @@ import { IsString, IsEmail, MinLength } from 'class-validator';
 export class RegisterUserDto {
   @ApiProperty()
   @IsString()
-  companyName: string;
-
-  @ApiProperty()
-  @IsString()
   fullName: string;
 
   @ApiProperty()
@@ -25,4 +21,24 @@ export class RegisterUserDto {
   @ApiProperty()
   @IsString()
   phoneNumber: string;
+
+  @ApiProperty()
+  @IsString()
+  companyName: string;
+
+  @ApiProperty()
+  @IsString()
+  companyEmail: string;
+
+  @ApiProperty()
+  @IsString()
+  companyCountryCode: string;
+
+  @ApiProperty()
+  @IsString()
+  companyPhoneNumber: string;
+
+  @ApiProperty()
+  @IsString()
+  address: string;
 }
