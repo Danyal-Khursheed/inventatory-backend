@@ -26,14 +26,14 @@ export class ForgotPasswordHandler
 
     const user = await this.userRepository.findOne({ where: { email } });
 
+    if (!user) {
+      throw new BadRequestException('User not found with this email.');
+    }
+
     const token = this.jwtService.sign(
       { id: user?.id },
       { secret: process.env.JWT_SECRET },
     );
-
-    if (!user) {
-      throw new BadRequestException('User not found with this email.');
-    }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 

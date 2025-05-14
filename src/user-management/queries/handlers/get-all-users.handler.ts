@@ -14,7 +14,9 @@ export class GetAllUsersQueryHandle implements IQueryHandler<GetAllUsersQuery> {
   async execute(query: GetAllUsersQuery): Promise<any> {
     const { role, companyId, pageNumber, pageSize, searchTerm } = query;
 
-    const qb = this.usersRepository.createQueryBuilder('user');
+    const qb = this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.company', 'company');
 
     if (role !== 'super_admin') {
       qb.where('user.companyId = :companyId', { companyId });
@@ -38,7 +40,10 @@ export class GetAllUsersQueryHandle implements IQueryHandler<GetAllUsersQuery> {
 
     const sanitizedUsers = users.map(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      ({ password, refreshToken, ...rest }) => rest,
+      ({ password, refreshToken, company, ...rest }) => ({
+        ...rest,
+        companyName: company?.companyName || null,
+      }),
     );
 
     return {
