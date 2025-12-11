@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CompanyEntity } from 'src/companies-management/entity/create-company.entity';
 import { BadRequestException } from '@nestjs/common';
+import { I18nHelperService } from 'src/i18n/i18n.service';
+import { I18nContext } from 'nestjs-i18n';
 
 @CommandHandler(CreateCompanyCommand)
 export class CreateCompanyHandler
@@ -12,6 +14,7 @@ export class CreateCompanyHandler
   constructor(
     @InjectRepository(CompanyEntity)
     private readonly companyRepository: Repository<CompanyEntity>,
+    private readonly i18nHelper: I18nHelperService,
   ) {}
 
   async execute(command: CreateCompanyCommand): Promise<any> {
@@ -22,7 +25,9 @@ export class CreateCompanyHandler
     });
 
     if (existingCompany) {
-      throw new BadRequestException('company with this name already exist');
+      const lang = I18nContext.current()?.lang || 'en';
+      const message = this.i18nHelper.translateError('companyNameExist', {}, lang);
+      throw new BadRequestException(message);
     }
 
     const company = this.companyRepository.create({
@@ -37,6 +42,9 @@ export class CreateCompanyHandler
 
     await this.companyRepository.save(company);
 
-    return { message: 'Company Created Successfully' };
+    const lang = I18nContext.current()?.lang || 'en';
+    const message = this.i18nHelper.translateSuccess('companyCreated', {}, lang);
+
+    return { message };
   }
 }

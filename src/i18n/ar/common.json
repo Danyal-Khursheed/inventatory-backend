@@ -1,0 +1,42 @@
+{
+  "validation": {
+    "email": "يجب أن يكون البريد الإلكتروني عنوان بريد إلكتروني صالح",
+    "required": "{field} مطلوب",
+    "minLength": "{field} يجب أن يكون على الأقل {min} أحرف",
+    "maxLength": "{field} يجب ألا يتجاوز {max} حرف",
+    "isString": "{field} يجب أن يكون نص",
+    "isNumber": "{field} يجب أن يكون رقماً",
+    "isEnum": "{field} يجب أن يكون أحد القيم التالية: {values}"
+  },
+  "errors": {
+    "emailAlreadyExists": "البريد الإلكتروني موجود بالفعل",
+    "emailAlreadyExist": "البريد الإلكتروني موجود بالفعل",
+    "companyNameExists": "شركة بهذا الاسم موجودة بالفعل",
+    "companyNameExist": "شركة بهذا الاسم موجودة بالفعل",
+    "companyNotFound": "الشركة غير موجودة",
+    "userNotFound": "المستخدم غير موجود",
+    "roleNotFound": "الدور غير موجود",
+    "permissionNotFound": "الصلاحية غير موجودة",
+    "invalidCredentials": "بيانات اعتماد غير صحيحة",
+    "unauthorized": "غير مصرح",
+    "missingRegistrationToken": "رمز التسجيل مفقود",
+    "invalidToken": "رمز غير صالح",
+    "invalidOtp": "رمز OTP غير صالح",
+    "otpExpired": "انتهت صلاحية رمز OTP",
+    "passwordMismatch": "كلمات المرور غير متطابقة"
+  },
+  "success": {
+    "companyCreated": "تم إنشاء الشركة بنجاح",
+    "companyUpdated": "تم تحديث الشركة بنجاح",
+    "companyDeleted": "تم حذف الشركة بنجاح",
+    "userCreated": "تم إنشاء المستخدم بنجاح",
+    "userUpdated": "تم تحديث المستخدم بنجاح",
+    "userDeleted": "تم حذف المستخدم بنجاح",
+    "roleCreated": "تم إنشاء الدور بنجاح",
+    "roleUpdated": "تم تحديث الدور بنجاح",
+    "roleDeleted": "تم حذف الدور بنجاح",
+    "otpGenerated": "تم إنشاء رمز OTP بنجاح",
+    "passwordReset": "تم إعادة تعيين كلمة المرور بنجاح"
+  }
+}
+

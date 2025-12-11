@@ -1,0 +1,42 @@
+{
+  "validation": {
+    "email": "Email must be a valid email address",
+    "required": "{field} is required",
+    "minLength": "{field} must be at least {min} characters",
+    "maxLength": "{field} must not exceed {max} characters",
+    "isString": "{field} must be a string",
+    "isNumber": "{field} must be a number",
+    "isEnum": "{field} must be one of the following values: {values}"
+  },
+  "errors": {
+    "emailAlreadyExists": "Email already exists",
+    "emailAlreadyExist": "Email already exist",
+    "companyNameExists": "Company with this name already exists",
+    "companyNameExist": "company with this name already exist",
+    "companyNotFound": "Company not found",
+    "userNotFound": "User not found",
+    "roleNotFound": "Role not found",
+    "permissionNotFound": "Permission not found",
+    "invalidCredentials": "Invalid credentials",
+    "unauthorized": "Unauthorized",
+    "missingRegistrationToken": "Missing registration token",
+    "invalidToken": "Invalid token",
+    "invalidOtp": "Invalid OTP",
+    "otpExpired": "OTP has expired",
+    "passwordMismatch": "Passwords do not match"
+  },
+  "success": {
+    "companyCreated": "Company Created Successfully",
+    "companyUpdated": "Company Updated Successfully",
+    "companyDeleted": "Company Deleted Successfully",
+    "userCreated": "User Created Successfully",
+    "userUpdated": "User Updated Successfully",
+    "userDeleted": "User Deleted Successfully",
+    "roleCreated": "Role Created Successfully",
+    "roleUpdated": "Role Updated Successfully",
+    "roleDeleted": "Role Deleted Successfully",
+    "otpGenerated": "OTP generated successfully",
+    "passwordReset": "Password reset successfully"
+  }
+}
+
