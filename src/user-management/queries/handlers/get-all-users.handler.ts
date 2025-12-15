@@ -12,24 +12,15 @@ export class GetAllUsersQueryHandle implements IQueryHandler<GetAllUsersQuery> {
   ) {}
 
   async execute(query: GetAllUsersQuery): Promise<any> {
-    const { role, companyId, pageNumber, pageSize, searchTerm } = query;
+    const { role, pageNumber, pageSize, searchTerm } = query;
 
-    const qb = this.usersRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.company', 'company');
-
-    if (role !== 'super_admin') {
-      qb.where('user.companyId = :companyId', { companyId });
-    }
+    const qb = this.usersRepository.createQueryBuilder('user');
 
     if (searchTerm) {
-      const searchCondition =
-        '(user.fullName ILIKE :search OR user.email ILIKE :search)';
-      if (role !== 'super_admin') {
-        qb.andWhere(searchCondition, { search: `%${searchTerm}%` });
-      } else {
-        qb.where(searchCondition, { search: `%${searchTerm}%` });
-      }
+      qb.where(
+        '(user.fullName ILIKE :search OR user.email ILIKE :search)',
+        { search: `%${searchTerm}%` },
+      );
     }
 
     const [users, totalCount] = await qb
@@ -40,10 +31,7 @@ export class GetAllUsersQueryHandle implements IQueryHandler<GetAllUsersQuery> {
 
     const sanitizedUsers = users.map(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      ({ password, refreshToken, company, ...rest }) => ({
-        ...rest,
-        companyName: company?.companyName || null,
-      }),
+      ({ password, refreshToken, ...rest }) => rest,
     );
 
     return {

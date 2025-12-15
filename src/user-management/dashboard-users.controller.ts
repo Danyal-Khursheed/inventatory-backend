@@ -41,9 +41,9 @@ export class DashboardUsersController {
     @Query('pageSize') pageSize: number,
     @Query('searchTerm') searchTerm?: string,
   ): Promise<any> {
-    const { role, companyId } = req.user;
+    const { role } = req.user;
     return await this.queryBus.execute(
-      new GetAllUsersQuery(role, companyId, pageNumber, pageSize, searchTerm),
+      new GetAllUsersQuery(role, pageNumber, pageSize, searchTerm),
     );
   }
 

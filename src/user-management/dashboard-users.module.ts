@@ -5,10 +5,9 @@ import { DashboardUsersController } from './dashboard-users.controller';
 import { UserEntity } from 'src/users/entities/users.entity';
 import commandHandlers from './commands/handlers';
 import queryHandlers from './queries/handlers';
-import { CompanyEntity } from 'src/companies-management/entity/create-company.entity';
 
 @Module({
-  imports: [CqrsModule, TypeOrmModule.forFeature([UserEntity, CompanyEntity])],
+  imports: [CqrsModule, TypeOrmModule.forFeature([UserEntity])],
   controllers: [DashboardUsersController],
   providers: [...commandHandlers, ...queryHandlers],
 })

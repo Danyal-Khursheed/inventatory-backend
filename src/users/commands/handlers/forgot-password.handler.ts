@@ -19,9 +19,7 @@ export class ForgotPasswordHandler
     private readonly jwtService: JwtService,
   ) {}
 
-  async execute(
-    command: ForgotPasswordCommand,
-  ): Promise<{ otp: string; token: string }> {
+  async execute(command: ForgotPasswordCommand): Promise<{ token: string }> {
     const { email } = command;
 
     const user = await this.userRepository.findOne({ where: { email } });
@@ -32,13 +30,17 @@ export class ForgotPasswordHandler
 
     const token = this.jwtService.sign(
       { id: user?.id },
-      { secret: process.env.JWT_SECRET },
+      { secret: process.env.JWT_SECRET, expiresIn: '15m' },
     );
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiryDate = new Date();
+    expiryDate.setMinutes(expiryDate.getMinutes() + 15);
 
-    await this.otpRepository.save({ otp });
+    user.reset_password_token = token;
+    user.reset_password_expires_at = expiryDate;
 
-    return { otp, token };
+    await this.userRepository.save(user);
+
+    return { token };
   }
 }
