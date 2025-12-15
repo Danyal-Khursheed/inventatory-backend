@@ -19,19 +19,13 @@ export class ResetPasswordHandler
   ) {}
 
   async execute(command: ResetPasswordCommand): Promise<{ message: string }> {
-    const { id, otp, newPassword } = command;
+    const { token, newPassword } = command;
 
-    const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException('User not found with this email.');
-    }
-
-    const otpEntity = await this.otpRepository.findOne({
-      where: { otp },
+    const user = await this.userRepository.findOne({
+      where: { reset_password_token: token },
     });
-
-    if (!otpEntity) {
-      throw new BadRequestException('Invalid OTP.');
+    if (!user) {
+      throw new NotFoundException('Invalide token');
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -39,7 +33,6 @@ export class ResetPasswordHandler
     user.password = hashedPassword;
 
     await this.userRepository.save(user);
-    await this.otpRepository.remove(otpEntity);
 
     return { message: 'Password reset successfully' };
   }

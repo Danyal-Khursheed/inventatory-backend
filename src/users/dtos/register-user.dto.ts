@@ -24,21 +24,5 @@ export class RegisterUserDto {
 
   @ApiProperty()
   @IsString()
-  companyName: string;
-
-  @ApiProperty()
-  @IsString()
-  companyEmail: string;
-
-  @ApiProperty()
-  @IsString()
-  companyCountryCode: string;
-
-  @ApiProperty()
-  @IsString()
-  companyPhoneNumber: string;
-
-  @ApiProperty()
-  @IsString()
   address: string;
 }

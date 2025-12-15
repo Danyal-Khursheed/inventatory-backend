@@ -1,9 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { UserEntity } from 'src/users/entities/users.entity';
-import { CompanyEntity } from 'src/companies-management/entity/create-company.entity';
 import * as bcrypt from 'bcrypt';
 import { CreateUserCommand } from '../impl/create-user.command';
 
@@ -22,8 +21,6 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(CompanyEntity)
-    private readonly companyRepository: Repository<CompanyEntity>,
   ) {}
 
   async execute(command: CreateUserCommand): Promise<any> {
@@ -36,15 +33,6 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       throw new BadRequestException('Email already exists');
     }
 
-    const company = await this.companyRepository.findOne({
-      where: { companyName: dto.companyName },
-      select: ['id'],
-    });
-
-    if (!company) {
-      throw new NotFoundException('Company not found');
-    }
-
     const randomPassword = generateRandomPassword(8);
     const hashedPassword = await bcrypt.hash(randomPassword, 10);
 
@@ -52,7 +40,6 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       ...dto,
       role: dto.role ?? 'admin',
       password: hashedPassword,
-      companyId: company.id,
     });
 
     await this.userRepository.save(user);

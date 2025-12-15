@@ -8,7 +8,6 @@ import { AuthModule } from './auth/auth.module';
 import { DashboardUsersModule } from './user-management/dashboard-users.module';
 import { RolesModule } from './roles-management/roles.module';
 import { PermissionsModule } from './permissions-management/permissions.module';
-import { CompaniesModule } from './companies-management/companies.module';
 
 import {
   I18nModule,
@@ -61,7 +60,6 @@ import { packagesModule } from './package/package.module';
     DashboardUsersModule,
     RolesModule,
     PermissionsModule,
-    CompaniesModule,
     packagesModule,
   ],
 

@@ -3,7 +3,7 @@ import { IsString } from 'class-validator';
 export class ResetPasswordDto {
   @ApiProperty()
   @IsString()
-  otp: string;
+  token: string;
 
   @ApiProperty()
   @IsString()

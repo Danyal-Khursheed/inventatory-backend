@@ -36,7 +36,6 @@ export class AuthService {
     const secret = this.configService.get<string>('JWT_SECRET');
     const payload = {
       id: user.id,
-      companyId: user.companyId,
       fullName: user.fullName,
       email: user.email,
       role: user.role,

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Request } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserDto } from './dtos/register-user.dto';
 import { RegisterUserCommand } from './commands/impl/register-user.command';
@@ -61,15 +61,17 @@ export class UsersController {
     };
   }
 
+  @Public()
   @Post('reset-password')
-  @ApiBearerAuth()
-  async resetPassword(
-    @Body() data: ResetPasswordDto,
-    @Request() req: RequestWithUser,
-  ): Promise<any> {
-    const { id } = req.user;
+  async resetPassword(@Body() data: ResetPasswordDto): Promise<any> {
     return await this.commandBus.execute(
-      new ResetPasswordCommand(id, data.otp, data.newPassword),
+      new ResetPasswordCommand(data.token, data.newPassword),
     );
+  }
+
+  @Get('me')
+  @ApiBearerAuth()
+  async currentUser(@Request() req: RequestWithUser) {
+    return req.user;
   }
 }
