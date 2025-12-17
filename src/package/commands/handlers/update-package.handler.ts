@@ -4,9 +4,10 @@ import { Repository } from 'typeorm';
 import { PackageEntity } from '../../entities/package.entity';
 
 import { UpdatePackageCommand } from '../impl/update-package.command';
+import { NotFoundException } from '@nestjs/common';
 
 @CommandHandler(UpdatePackageCommand)
-export class CreatePackageHandler
+export class UpdatePackageHandler
   implements ICommandHandler<UpdatePackageCommand>
 {
   constructor(
@@ -16,12 +17,22 @@ export class CreatePackageHandler
 
   async execute(command: UpdatePackageCommand) {
     const { id, dto } = command;
-    console.log(id);
-    console.log(dto);
 
-    // const pkg = this.packageRepo.create(dto);
-    // await this.packageRepo.save(pkg);
+    const pkg = await this.packageRepo.findOne({
+      where: { id },
+    });
 
-    // return { message: 'Package created', result: pkg };
+    if (!pkg) {
+      throw new NotFoundException('Package not found');
+    }
+
+    Object.assign(pkg, dto);
+
+    const updatedPackage = await this.packageRepo.save(pkg);
+
+    return {
+      message: 'Package updated successfully',
+      result: updatedPackage,
+    };
   }
 }

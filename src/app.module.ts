@@ -17,6 +17,8 @@ import {
 import * as path from 'path';
 import { I18nHelperModule } from './i18n/i18n.module';
 import { packagesModule } from './package/package.module';
+import { CompanyOriginModule } from './companies_origin_management/companies-origin.module';
+import { PickupAddressModule } from './pickup-address/pickup-address.module';
 
 @Module({
   imports: [
@@ -61,6 +63,8 @@ import { packagesModule } from './package/package.module';
     RolesModule,
     PermissionsModule,
     packagesModule,
+    CompanyOriginModule,
+    PickupAddressModule,
   ],
 
   providers: [AppService],
