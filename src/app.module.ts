@@ -20,6 +20,8 @@ import { WarehouseModule } from './warehouse/warehouse.module';
 import { WarehouseItemModule } from './warehouse-item/warehouse-item.module';
 import { CompanyOriginModule } from './companies_origin_management/companies-origin.module';
 import { PickupAddressModule } from './pickup-address/pickup-address.module';
+import { ShippingCompanyModule } from './shipping-company/shipping-company.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -67,6 +69,8 @@ import { PickupAddressModule } from './pickup-address/pickup-address.module';
     WarehouseItemModule,
     CompanyOriginModule,
     PickupAddressModule,
+    ShippingCompanyModule,
+    OrderModule,
   ],
 
   providers: [AppService],
