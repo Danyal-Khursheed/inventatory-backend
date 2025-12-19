@@ -59,9 +59,9 @@ import { PickupAddressModule } from './pickup-address/pickup-address.module';
 
     UsersModule,
     AuthModule,
-    DashboardUsersModule,
-    RolesModule,
-    PermissionsModule,
+    // DashboardUsersModule,
+    // RolesModule,
+    // PermissionsModule,
     packagesModule,
     CompanyOriginModule,
     PickupAddressModule,
