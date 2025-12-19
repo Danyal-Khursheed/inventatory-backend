@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn, Index } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('packages')
 export class PackageEntity {
@@ -27,4 +34,10 @@ export class PackageEntity {
   @Column('varchar')
   @Index()
   upc: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
