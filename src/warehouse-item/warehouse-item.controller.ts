@@ -19,6 +19,8 @@ import {
 import { RolesGuard } from 'src/middlewares/roles.gaurd';
 import { CreateWarehouseItemCommand } from './commands/impl/create-warehouse-item.command';
 import { CreateWarehouseItemDto } from './dto/create-warehouse-item.dto';
+import { CreateBulkWarehouseItemCommand } from './commands/impl/create-bulk-warehouse-item.command';
+import { CreateBulkWarehouseItemDto } from './dto/create-bulk-warehouse-item.dto';
 import { GetAllWarehouseItemsQuery } from './queries/impl/get-all-warehouse-items.query';
 import { GetSingleWarehouseItemQuery } from './queries/impl/get-single-warehouse-item.query';
 import { DeleteWarehouseItemCommand } from './commands/impl/delete-warehouse-item.command';
@@ -51,6 +53,30 @@ export class WarehouseItemController {
     @Body() dto: CreateWarehouseItemDto,
   ): Promise<any> {
     return await this.commandBus.execute(new CreateWarehouseItemCommand(dto));
+  }
+
+  @UseGuards(RolesGuard)
+  @ApiBearerAuth()
+  @Post('create-warehouse-items-bulk')
+  @ApiOperation({ summary: 'Create warehouse items in bulk' })
+  @ApiBody({ type: CreateBulkWarehouseItemDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Warehouse items created successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Successfully created X warehouse item(s)' },
+        count: { type: 'number', example: 5 },
+      },
+    },
+  })
+  async createWarehouseItemsBulk(
+    @Body() dto: CreateBulkWarehouseItemDto,
+  ): Promise<any> {
+    return await this.commandBus.execute(
+      new CreateBulkWarehouseItemCommand(dto),
+    );
   }
 
   @UseGuards(RolesGuard)

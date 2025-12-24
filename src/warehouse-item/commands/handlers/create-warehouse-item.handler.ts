@@ -25,7 +25,6 @@ export class CreateWarehouseItemHandler
     try {
       const { dto } = command;
 
-      // Verify warehouse exists
       const warehouse = await this.warehouseRepo.findOne({
         where: { id: dto.warehouseId },
       });
