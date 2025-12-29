@@ -19,12 +19,7 @@ export class CreatePickupAddressDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  address_line1: string;
-
-  @ApiProperty({ required: false })
-  @IsString()
-  @IsOptional()
-  address_line2?: string;
+  address: string;
 
   @ApiProperty({ required: false })
   @IsString()
@@ -34,21 +29,8 @@ export class CreatePickupAddressDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  @Length(1, 5)
-  phone_code: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   @Length(1, 20)
   mobile_no: string;
-
-  @ApiProperty({ default: 0 })
-  @IsInt()
-  @Min(0)
-  @Max(1)
-  @IsOptional()
-  is_default?: number;
 
   @ApiProperty()
   @IsString()
@@ -59,16 +41,6 @@ export class CreatePickupAddressDto {
   @IsString()
   @IsNotEmpty()
   longitude: string;
-
-  @ApiProperty({ required: false, nullable: true })
-  @IsString()
-  @IsOptional()
-  pickup_data?: string | null;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  hash: string;
 
   @ApiProperty()
   @IsString()

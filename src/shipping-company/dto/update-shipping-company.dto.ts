@@ -5,11 +5,6 @@ export class UpdateShippingCompanyDto {
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  hash?: string;
-
-  @ApiProperty({ required: false })
-  @IsString()
-  @IsOptional()
   serviceName?: string;
 
   @ApiProperty({ required: false })

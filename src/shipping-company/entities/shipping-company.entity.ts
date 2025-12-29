@@ -11,9 +11,6 @@ export class ShippingCompanyEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  hash: string;
-
   @Column({ name: 'service_name' })
   serviceName: string;
 

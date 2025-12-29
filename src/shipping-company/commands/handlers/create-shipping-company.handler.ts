@@ -22,15 +22,6 @@ export class CreateShippingCompanyHandler
     try {
       const { dto } = command;
 
-      const existing = await this.shippingCompanyRepo.findOne({
-        where: { hash: dto.hash },
-      });
-      if (existing) {
-        throw new ConflictException(
-          `Shipping company with hash "${dto.hash}" already exists`,
-        );
-      }
-
       const shippingCompany = this.shippingCompanyRepo.create(dto);
       const saved = await this.shippingCompanyRepo.save(shippingCompany);
 
