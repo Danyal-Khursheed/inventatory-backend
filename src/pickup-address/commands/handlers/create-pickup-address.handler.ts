@@ -18,16 +18,11 @@ export class CreatePickupAddressHandler
 
     const pickupAddress = this.pickupAddressRepo.create({
       addressNick: dto.address_nick,
-      addressLine1: dto.address_line1,
-      addressLine2: dto.address_line2,
+      address: dto.address,
       zipCode: dto.zip_code,
-      phoneCode: dto.phone_code,
       mobileNo: dto.mobile_no,
-      isDefault: dto.is_default ?? 0,
       latitude: dto.latitude,
       longitude: dto.longitude,
-      pickupData: dto.pickup_data ?? null,
-      hash: dto.hash,
       cityName: dto.city_name,
       countryName: dto.country_name,
       countryCode: dto.country_code,

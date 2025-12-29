@@ -5,11 +5,6 @@ export class CreateShippingCompanyDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  hash: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   serviceName: string;
 
   @ApiProperty()
