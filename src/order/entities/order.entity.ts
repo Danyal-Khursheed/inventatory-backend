@@ -5,47 +5,40 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  OneToOne,
   OneToMany,
   JoinColumn,
 } from 'typeorm';
 import { ShippingCompanyEntity } from '../../shipping-company/entities/shipping-company.entity';
-import { OrderPackageEntity } from './order-package.entity';
-import { ReceiverEntity } from './receiver.entity';
-import { SenderEntity } from './sender.entity';
-import { SenderAddressEntity } from './sender-address.entity';
+import { WarehouseEntity } from '../../warehouse/entities/warehouse.entity';
+import { CompanyOrigin } from '../../companies_origin_management/entity/companies.entity';
+import { PickupAddressEntity } from '../../pickup-address/entities/pickup-address.entity';
+import { OrderItemEntity } from './order-item.entity';
 
 @Entity('orders')
 export class OrderEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
-  hash: string;
+  @Column({ name: 'warehouse_id' })
+  warehouseId: string;
 
-  @Column({ name: 'service_name' })
-  serviceName: string;
+  @ManyToOne(() => WarehouseEntity)
+  @JoinColumn({ name: 'warehouse_id' })
+  warehouse: WarehouseEntity;
 
-  @Column({ name: 'service_type' })
-  serviceType: string;
+  @Column({ name: 'country_origin_id' })
+  countryOriginId: string;
 
-  @Column({ type: 'text', nullable: true })
-  notes: string;
+  @ManyToOne(() => CompanyOrigin)
+  @JoinColumn({ name: 'country_origin_id' })
+  countryOrigin: CompanyOrigin;
 
-  @Column({ name: 'order_total', type: 'decimal', precision: 10, scale: 2 })
-  orderTotal: number;
+  @Column({ name: 'pickup_address_id' })
+  pickupAddressId: string;
 
-  @Column({ name: 'payment_currency', length: 3 })
-  paymentCurrency: string;
-
-  @Column({ name: 'payment_method' })
-  paymentMethod: string;
-
-  @Column({ name: 'preferred_date', type: 'date', nullable: true })
-  preferredDate: Date | null;
-
-  @Column({ name: 'reference_id', nullable: true })
-  referenceId: string;
+  @ManyToOne(() => PickupAddressEntity)
+  @JoinColumn({ name: 'pickup_address_id' })
+  pickupAddress: PickupAddressEntity;
 
   @Column({ name: 'shipping_company_id', nullable: true })
   shippingCompanyId: string;
@@ -54,21 +47,34 @@ export class OrderEntity {
   @JoinColumn({ name: 'shipping_company_id' })
   shippingCompany: ShippingCompanyEntity;
 
-  @OneToMany(() => OrderPackageEntity, (orderPackage) => orderPackage.order)
-  packages: OrderPackageEntity[];
+  @Column({ name: 'quantity_ordered', type: 'int' })
+  quantityOrdered: number;
 
-  @OneToOne(() => ReceiverEntity, (receiver) => receiver.order, {
+  @Column({ name: 'unit_price', type: 'decimal', precision: 10, scale: 2 })
+  unitPrice: number;
+
+  @Column({ name: 'total_price', type: 'decimal', precision: 10, scale: 2 })
+  totalPrice: number;
+
+  @Column({ name: 'total_weight', type: 'decimal', precision: 10, scale: 2 })
+  totalWeight: number;
+
+  @Column({ name: 'order_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  orderDate: Date;
+
+  @Column({ name: 'order_status', default: 'pending' })
+  orderStatus: string;
+
+  @Column({ name: 'payment_status', default: 'pending' })
+  paymentStatus: string;
+
+  @Column({ name: 'delivery_date', type: 'timestamp', nullable: true })
+  deliveryDate: Date | null;
+
+  @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.order, {
     cascade: true,
   })
-  receiver: ReceiverEntity;
-
-  @OneToOne(() => SenderEntity, (sender) => sender.order, { cascade: true })
-  sender: SenderEntity;
-
-  @OneToOne(() => SenderAddressEntity, (senderAddress) => senderAddress.order, {
-    cascade: true,
-  })
-  senderAddress: SenderAddressEntity;
+  orderItems: OrderItemEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
@@ -76,4 +82,3 @@ export class OrderEntity {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }
-

@@ -4,7 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { WarehouseEntity } from '../../warehouse/entities/warehouse.entity';
 
 @Entity('shipping_companies')
 export class ShippingCompanyEntity {
@@ -16,6 +19,13 @@ export class ShippingCompanyEntity {
 
   @Column({ name: 'service_type' })
   serviceType: string;
+
+  @Column({ name: 'warehouse_id', nullable: true })
+  warehouseId: string;
+
+  @ManyToOne(() => WarehouseEntity, (warehouse) => warehouse.shippingCompanies)
+  @JoinColumn({ name: 'warehouse_id' })
+  warehouse: WarehouseEntity;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

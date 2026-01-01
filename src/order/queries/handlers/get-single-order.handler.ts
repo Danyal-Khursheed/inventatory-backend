@@ -20,12 +20,12 @@ export class GetSingleOrderHandler implements IQueryHandler<GetSingleOrderQuery>
       const order = await this.orderRepo.findOne({
         where: { id },
         relations: [
-          'packages',
-          'packages.items',
-          'receiver',
-          'sender',
-          'senderAddress',
+          'warehouse',
+          'countryOrigin',
+          'pickupAddress',
           'shippingCompany',
+          'orderItems',
+          'orderItems.warehouseItem',
         ],
       });
 

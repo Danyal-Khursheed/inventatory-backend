@@ -34,7 +34,12 @@ export class CreateWarehouseItemHandler
         );
       }
 
-      const warehouseItem = this.warehouseItemRepo.create(dto);
+      const warehouseItem = this.warehouseItemRepo.create({
+        name: dto.name,
+        pricePerItem: dto.pricePerItem,
+        quantity: dto.quantity,
+        warehouseId: dto.warehouseId,
+      });
       const savedWarehouseItem = await this.warehouseItemRepo.save(warehouseItem);
 
       return {

@@ -1,12 +1,7 @@
 import { CreateOrderHandler } from './create-order.handler';
-import { DeleteOrderHandler } from './delete-order.handler';
-import { UpdateOrderHandler } from './update-order.handler';
+import { SubmitOrderHandler } from './submit-order.handler';
 
-const commandHandlers = [
-  CreateOrderHandler,
-  DeleteOrderHandler,
-  UpdateOrderHandler,
-];
+const commandHandlers = [CreateOrderHandler, SubmitOrderHandler];
 
 export default commandHandlers;
 

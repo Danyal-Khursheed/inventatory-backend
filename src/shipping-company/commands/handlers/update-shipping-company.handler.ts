@@ -2,6 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ShippingCompanyEntity } from '../../entities/shipping-company.entity';
+import { WarehouseEntity } from '../../../warehouse/entities/warehouse.entity';
 import { UpdateShippingCompanyCommand } from '../impl/update-shipping-company.command';
 import {
   BadRequestException,
@@ -16,6 +17,8 @@ export class UpdateShippingCompanyHandler
   constructor(
     @InjectRepository(ShippingCompanyEntity)
     private readonly shippingCompanyRepo: Repository<ShippingCompanyEntity>,
+    @InjectRepository(WarehouseEntity)
+    private readonly warehouseRepo: Repository<WarehouseEntity>,
   ) {}
 
   async execute(command: UpdateShippingCompanyCommand) {
@@ -29,6 +32,18 @@ export class UpdateShippingCompanyHandler
         throw new NotFoundException(
           `Shipping company with ID "${id}" not found`,
         );
+      }
+
+      // Verify warehouse if being updated
+      if (dto.warehouseId) {
+        const warehouse = await this.warehouseRepo.findOne({
+          where: { id: dto.warehouseId },
+        });
+        if (!warehouse) {
+          throw new NotFoundException(
+            `Warehouse with ID "${dto.warehouseId}" not found`,
+          );
+        }
       }
 
       Object.assign(shippingCompany, dto);

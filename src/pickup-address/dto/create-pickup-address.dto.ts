@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsUUID,
   Length,
   IsInt,
   Min,
@@ -57,5 +58,10 @@ export class CreatePickupAddressDto {
   @IsNotEmpty()
   @Length(2, 2)
   country_code: string;
+
+  @ApiProperty()
+  @IsUUID()
+  @IsNotEmpty()
+  warehouse_id: string;
 }
 

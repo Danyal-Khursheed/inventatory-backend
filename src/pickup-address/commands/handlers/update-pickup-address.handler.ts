@@ -2,8 +2,12 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PickupAddressEntity } from '../../entities/pickup-address.entity';
+import { WarehouseEntity } from '../../../warehouse/entities/warehouse.entity';
 import { UpdatePickupAddressCommand } from '../impl/update-pickup-address.command';
-import { NotFoundException } from '@nestjs/common';
+import {
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 @CommandHandler(UpdatePickupAddressCommand)
 export class UpdatePickupAddressHandler
@@ -12,6 +16,8 @@ export class UpdatePickupAddressHandler
   constructor(
     @InjectRepository(PickupAddressEntity)
     private readonly pickupAddressRepo: Repository<PickupAddressEntity>,
+    @InjectRepository(WarehouseEntity)
+    private readonly warehouseRepo: Repository<WarehouseEntity>,
   ) {}
 
   async execute(command: UpdatePickupAddressCommand) {
@@ -36,6 +42,18 @@ export class UpdatePickupAddressHandler
     if (dto.city_name !== undefined) updateData.cityName = dto.city_name;
     if (dto.country_name !== undefined) updateData.countryName = dto.country_name;
     if (dto.country_code !== undefined) updateData.countryCode = dto.country_code;
+    if (dto.warehouse_id !== undefined) {
+      // Verify warehouse exists if being updated
+      const warehouse = await this.warehouseRepo.findOne({
+        where: { id: dto.warehouse_id },
+      });
+      if (!warehouse) {
+        throw new NotFoundException(
+          `Warehouse with ID "${dto.warehouse_id}" not found`,
+        );
+      }
+      updateData.warehouseId = dto.warehouse_id;
+    }
 
     Object.assign(pickupAddress, updateData);
 
