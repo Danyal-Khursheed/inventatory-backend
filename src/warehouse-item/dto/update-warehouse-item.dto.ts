@@ -16,6 +16,12 @@ export class UpdateWarehouseItemDto {
   @ApiProperty({ required: false })
   @IsNumber()
   @IsOptional()
+  @Min(0, { message: 'weightPerItem must be greater than or equal to 0' })
+  weightPerItem?: number;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
   @Min(0, { message: 'quantity must be greater than or equal to 0' })
   quantity?: number;
 

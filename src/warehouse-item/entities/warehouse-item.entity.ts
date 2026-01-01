@@ -20,6 +20,9 @@ export class WarehouseItemEntity {
   @Column({ name: 'price_per_item', type: 'decimal', precision: 10, scale: 2, nullable: true })
   pricePerItem: number;
 
+  @Column({ name: 'weight_per_item', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  weightPerItem: number;
+
   @Column({ type: 'int' })
   quantity: number;
 

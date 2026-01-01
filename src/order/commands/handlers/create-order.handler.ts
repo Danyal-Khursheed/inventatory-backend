@@ -122,10 +122,12 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
           itemInput.totalPrice !== undefined
             ? Number(itemInput.totalPrice)
             : unitPrice * quantity;
-        // Use provided totalWeight or default to 0
+        // Use provided totalWeight or calculate from weightPerItem
         const itemTotalWeight =
           itemInput.totalWeight !== undefined
             ? Number(itemInput.totalWeight)
+            : warehouseItem.weightPerItem
+            ? Number(warehouseItem.weightPerItem) * quantity
             : 0;
 
         totalQuantity += quantity;

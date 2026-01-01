@@ -37,6 +37,7 @@ export class CreateWarehouseItemHandler
       const warehouseItem = this.warehouseItemRepo.create({
         name: dto.name,
         pricePerItem: dto.pricePerItem,
+        weightPerItem: dto.weightPerItem,
         quantity: dto.quantity,
         warehouseId: dto.warehouseId,
       });
