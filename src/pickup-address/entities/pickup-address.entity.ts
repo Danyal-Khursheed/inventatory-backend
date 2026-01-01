@@ -7,7 +7,6 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { CountryEntity } from '../../country/entities/country.entity';
 import { WarehouseEntity } from '../../warehouse/entities/warehouse.entity';
 
 @Entity('pickup_addresses')
@@ -41,13 +40,6 @@ export class PickupAddressEntity {
 
   @Column({ name: 'country_code', length: 2 })
   countryCode: string;
-
-  @Column({ name: 'country_id', nullable: true })
-  countryId: string;
-
-  @ManyToOne(() => CountryEntity, { nullable: true })
-  @JoinColumn({ name: 'country_id' })
-  country: CountryEntity;
 
   @Column({ name: 'warehouse_id', nullable: true })
   warehouseId: string;

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, Length } from 'class-validator';
 
 export class UpdateWarehouseDto {
   @ApiProperty({ required: false })
@@ -20,6 +20,12 @@ export class UpdateWarehouseDto {
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  country?: string;
+  countryName?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  @Length(2, 2)
+  countryCode?: string;
 }
 

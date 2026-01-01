@@ -8,7 +8,6 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { CountryEntity } from '../../country/entities/country.entity';
 import { WarehouseEntity } from '../../warehouse/entities/warehouse.entity';
 
 @Entity('companies_origin')
@@ -49,22 +48,12 @@ export class CompanyOrigin {
   @Column({ name: 'phone_number', length: 20 })
   mobileNo: string;
 
-  @Column({ name: 'country_id', nullable: true })
-  countryId: string;
-
-  @ManyToOne(() => CountryEntity, { nullable: true })
-  @JoinColumn({ name: 'country_id' })
-  country: CountryEntity;
-
   @Column({ name: 'warehouse_id', nullable: true })
   warehouseId: string;
 
   @ManyToOne(() => WarehouseEntity, (warehouse) => warehouse.countryOrigins)
   @JoinColumn({ name: 'warehouse_id' })
   warehouse: WarehouseEntity;
-
-  @OneToMany(() => WarehouseEntity, (warehouse) => warehouse.countryOrigin)
-  warehouses: WarehouseEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
