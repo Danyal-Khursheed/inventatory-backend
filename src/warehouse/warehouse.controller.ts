@@ -35,17 +35,87 @@ export class WarehouseController {
   @UseGuards(RolesGuard)
   @ApiBearerAuth()
   @Post('create-warehouse')
-  @ApiOperation({ summary: 'Create a new warehouse' })
-  @ApiBody({ type: CreateWarehouseDto })
+  @ApiOperation({ 
+    summary: 'Create a new warehouse',
+    description: 'Creates a new warehouse with the provided details. Name is required, all other fields are optional.',
+  })
+  @ApiBody({ 
+    type: CreateWarehouseDto,
+    description: 'Warehouse creation data',
+    examples: {
+      minimal: {
+        summary: 'Minimal request (only required field)',
+        value: {
+          name: 'Main Warehouse',
+        },
+      },
+      full: {
+        summary: 'Full request (all fields)',
+        value: {
+          name: 'Main Warehouse',
+          address: '123 Main Street',
+          city: 'Dubai',
+          countryName: 'United Arab Emirates',
+          countryCode: 'AE',
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 201,
     description: 'Warehouse created successfully',
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'Warehouse created' },
+        message: { 
+          type: 'string', 
+          example: 'Warehouse created successfully' 
+        },
+        result: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid', example: '123e4567-e89b-12d3-a456-426614174000' },
+            name: { type: 'string', example: 'Main Warehouse' },
+            address: { type: 'string', example: '123 Main Street', nullable: true },
+            city: { type: 'string', example: 'Dubai', nullable: true },
+            countryName: { type: 'string', example: 'United Arab Emirates', nullable: true },
+            countryCode: { type: 'string', example: 'AE', nullable: true },
+            createdAt: { type: 'string', format: 'date-time', example: '2026-01-01T09:00:00.000Z' },
+            updatedAt: { type: 'string', format: 'date-time', example: '2026-01-01T09:00:00.000Z' },
+          },
+        },
       },
     },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request - Validation failed',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: { type: 'number', example: 400 },
+        message: { type: 'string', example: 'Validation failed' },
+        errors: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              field: { type: 'string', example: 'name' },
+              messages: { 
+                type: 'array', 
+                items: { type: 'string' },
+                example: ['name should not be empty', 'name must be a string'],
+              },
+              value: { type: 'string', example: '', nullable: true },
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
   })
   async createWarehouse(@Body() dto: CreateWarehouseDto): Promise<any> {
     return await this.commandBus.execute(new CreateWarehouseCommand(dto));
