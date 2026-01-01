@@ -9,18 +9,13 @@ export class CreateWarehouseItemDto {
 
   @ApiProperty()
   @IsNumber()
-  @Min(0, { message: 'price must be greater than or equal to 0' })
-  price: number;
+  @Min(0, { message: 'pricePerItem must be greater than or equal to 0' })
+  pricePerItem: number;
 
   @ApiProperty()
   @IsNumber()
   @Min(0, { message: 'quantity must be greater than or equal to 0' })
   quantity: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @Min(0, { message: 'weight must be greater than or equal to 0' })
-  weight: number;
 
   @ApiProperty()
   @IsUUID()

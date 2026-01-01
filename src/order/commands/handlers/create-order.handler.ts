@@ -2,17 +2,15 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderEntity } from '../../entities/order.entity';
-import { OrderPackageEntity } from '../../entities/order-package.entity';
 import { OrderItemEntity } from '../../entities/order-item.entity';
-import { ReceiverEntity } from '../../entities/receiver.entity';
-import { SenderEntity } from '../../entities/sender.entity';
-import { SenderAddressEntity } from '../../entities/sender-address.entity';
-import { ShippingCompanyEntity } from '../../../shipping-company/entities/shipping-company.entity';
+import { WarehouseEntity } from '../../../warehouse/entities/warehouse.entity';
+import { WarehouseItemEntity } from '../../../warehouse-item/entities/warehouse-item.entity';
+import { CompanyOrigin } from '../../../companies_origin_management/entity/companies.entity';
+import { PickupAddressEntity } from '../../../pickup-address/entities/pickup-address.entity';
 import { CreateOrderCommand } from '../impl/create-order.command';
 import {
   BadRequestException,
   NotFoundException,
-  ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
 
@@ -21,140 +19,170 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
   constructor(
     @InjectRepository(OrderEntity)
     private readonly orderRepo: Repository<OrderEntity>,
-    @InjectRepository(OrderPackageEntity)
-    private readonly orderPackageRepo: Repository<OrderPackageEntity>,
     @InjectRepository(OrderItemEntity)
     private readonly orderItemRepo: Repository<OrderItemEntity>,
-    @InjectRepository(ReceiverEntity)
-    private readonly receiverRepo: Repository<ReceiverEntity>,
-    @InjectRepository(SenderEntity)
-    private readonly senderRepo: Repository<SenderEntity>,
-    @InjectRepository(SenderAddressEntity)
-    private readonly senderAddressRepo: Repository<SenderAddressEntity>,
-    @InjectRepository(ShippingCompanyEntity)
-    private readonly shippingCompanyRepo: Repository<ShippingCompanyEntity>,
+    @InjectRepository(WarehouseEntity)
+    private readonly warehouseRepo: Repository<WarehouseEntity>,
+    @InjectRepository(WarehouseItemEntity)
+    private readonly warehouseItemRepo: Repository<WarehouseItemEntity>,
+    @InjectRepository(CompanyOrigin)
+    private readonly companyOriginRepo: Repository<CompanyOrigin>,
+    @InjectRepository(PickupAddressEntity)
+    private readonly pickupAddressRepo: Repository<PickupAddressEntity>,
   ) {}
 
   async execute(command: CreateOrderCommand) {
     try {
       const { dto } = command;
 
-      // Check if hash already exists
-      const existingOrder = await this.orderRepo.findOne({
-        where: { hash: dto.hash },
+      // Verify warehouse exists
+      const warehouse = await this.warehouseRepo.findOne({
+        where: { id: dto.warehouseId },
       });
-      if (existingOrder) {
-        throw new ConflictException(
-          `Order with hash "${dto.hash}" already exists`,
+      if (!warehouse) {
+        throw new NotFoundException(
+          `Warehouse with ID "${dto.warehouseId}" not found`,
         );
       }
 
-      // Verify shipping company exists if provided
-      if (dto.shippingCompanyId) {
-        const shippingCompany = await this.shippingCompanyRepo.findOne({
-          where: { id: dto.shippingCompanyId },
-        });
-        if (!shippingCompany) {
+      // Verify country origin exists
+      const countryOrigin = await this.companyOriginRepo.findOne({
+        where: { id: dto.countryOriginId },
+      });
+      if (!countryOrigin) {
+        throw new NotFoundException(
+          `Country origin with ID "${dto.countryOriginId}" not found`,
+        );
+      }
+
+      // Verify pickup address exists
+      const pickupAddress = await this.pickupAddressRepo.findOne({
+        where: { id: dto.pickupAddressId },
+      });
+      if (!pickupAddress) {
+        throw new NotFoundException(
+          `Pickup address with ID "${dto.pickupAddressId}" not found`,
+        );
+      }
+
+      // Verify all warehouse items exist and belong to the warehouse
+      const warehouseItemIds = dto.items.map((item) => item.warehouseItemId);
+      const warehouseItems = await this.warehouseItemRepo.find({
+        where: warehouseItemIds.map((id) => ({ id })),
+      });
+
+      if (warehouseItems.length !== warehouseItemIds.length) {
+        const foundIds = warehouseItems.map((item) => item.id);
+        const missingIds = warehouseItemIds.filter(
+          (id) => !foundIds.includes(id),
+        );
+        throw new NotFoundException(
+          `Warehouse item(s) with ID(s) "${missingIds.join(', ')}" not found`,
+        );
+      }
+
+      // Verify all items belong to the specified warehouse
+      const invalidItems = warehouseItems.filter(
+        (item) => item.warehouseId !== dto.warehouseId,
+      );
+      if (invalidItems.length > 0) {
+        throw new BadRequestException(
+          `Some warehouse items do not belong to the specified warehouse`,
+        );
+      }
+
+      // Calculate order totals
+      let totalQuantity = 0;
+      let totalPrice = 0;
+      let totalWeight = 0;
+      const orderItemsData: Partial<OrderItemEntity>[] = [];
+
+      for (const itemInput of dto.items) {
+        const warehouseItem = warehouseItems.find(
+          (wi) => wi.id === itemInput.warehouseItemId,
+        );
+        
+        if (!warehouseItem) {
           throw new NotFoundException(
-            `Shipping company with ID "${dto.shippingCompanyId}" not found`,
+            `Warehouse item with ID "${itemInput.warehouseItemId}" not found`,
           );
         }
+
+        const quantity = Number(itemInput.quantity);
+
+        if (warehouseItem.quantity < quantity) {
+          throw new BadRequestException(
+            `Insufficient quantity for item "${warehouseItem.name}". Available: ${warehouseItem.quantity}, Requested: ${quantity}`,
+          );
+        }
+
+        const unitPrice = Number(warehouseItem.pricePerItem);
+        // Use provided totalPrice or calculate it
+        const itemTotalPrice =
+          itemInput.totalPrice !== undefined
+            ? Number(itemInput.totalPrice)
+            : unitPrice * quantity;
+        // Use provided totalWeight or default to 0
+        const itemTotalWeight =
+          itemInput.totalWeight !== undefined
+            ? Number(itemInput.totalWeight)
+            : 0;
+
+        totalQuantity += quantity;
+        totalPrice += itemTotalPrice;
+        totalWeight += itemTotalWeight;
+
+        orderItemsData.push({
+          warehouseItemId: itemInput.warehouseItemId,
+          quantity,
+          unitPrice,
+          totalPrice: itemTotalPrice,
+          totalWeight: itemTotalWeight,
+        });
       }
 
-      // Create order
-      const orderData: Partial<OrderEntity> = {
-        hash: dto.hash,
-        serviceName: dto.serviceName,
-        serviceType: dto.serviceType,
-        notes: dto.notes,
-        orderTotal: dto.orderTotal,
-        paymentCurrency: dto.paymentCurrency,
-        paymentMethod: dto.paymentMethod,
-        preferredDate: dto.preferredDate
-          ? new Date(dto.preferredDate)
-          : null,
-        referenceId: dto.referenceId,
-        shippingCompanyId: dto.shippingCompanyId,
-      };
+      // Create order with pending status
+      const order = this.orderRepo.create({
+        warehouseId: dto.warehouseId,
+        countryOriginId: dto.countryOriginId,
+        pickupAddressId: dto.pickupAddressId,
+        quantityOrdered: totalQuantity,
+        unitPrice: totalPrice / totalQuantity || 0,
+        totalPrice,
+        totalWeight,
+        orderStatus: 'pending',
+        paymentStatus: 'pending',
+      });
 
-      const order = this.orderRepo.create(orderData);
       const savedOrder = await this.orderRepo.save(order);
 
-      // Create receiver
-      const receiver = this.receiverRepo.create({
-        ...dto.receiver,
-        orderId: savedOrder.id,
-      });
-      await this.receiverRepo.save(receiver);
-
-      // Create sender
-      const sender = this.senderRepo.create({
-        ...dto.sender,
-        orderId: savedOrder.id,
-      });
-      await this.senderRepo.save(sender);
-
-      // Create sender address
-      const senderAddressData: Partial<SenderAddressEntity> = {
-        mobileNo: dto.senderAddress.mobileNo,
-        addressLine1: dto.senderAddress.addressLine1,
-        addressLine2: dto.senderAddress.addressLine2,
-        cityName: dto.senderAddress.cityName,
-        countryName: dto.senderAddress.countryName,
-        countryCode: dto.senderAddress.countryCode,
-        zipCode: dto.senderAddress.zipCode,
-        latitude: dto.senderAddress.latitude?.toString(),
-        longitude: dto.senderAddress.longitude?.toString(),
-        orderId: savedOrder.id,
-      };
-      const senderAddress = this.senderAddressRepo.create(senderAddressData);
-      await this.senderAddressRepo.save(senderAddress);
-
-      // Create packages and items
-      for (const packageDto of dto.packages) {
-        const orderPackage = this.orderPackageRepo.create({
-          length: packageDto.length,
-          width: packageDto.width,
-          height: packageDto.height,
-          isDocument: packageDto.isDocument,
-          deadWeight: packageDto.deadWeight,
+      // Create order items
+      const orderItems = orderItemsData.map((itemData) =>
+        this.orderItemRepo.create({
+          ...itemData,
           orderId: savedOrder.id,
-        });
-        const savedPackage = await this.orderPackageRepo.save(orderPackage);
-
-        // Create items for this package
-        for (const itemDto of packageDto.items) {
-          const orderItem = this.orderItemRepo.create({
-            name: itemDto.name,
-            quantity: itemDto.quantity,
-            weight: itemDto.weight,
-            price: itemDto.price,
-            packageId: savedPackage.id,
-          });
-          await this.orderItemRepo.save(orderItem);
-        }
-      }
+        }),
+      );
+      await this.orderItemRepo.save(orderItems);
 
       // Fetch complete order with relations
       const completeOrder = await this.orderRepo.findOne({
         where: { id: savedOrder.id },
         relations: [
-          'packages',
-          'packages.items',
-          'receiver',
-          'sender',
-          'senderAddress',
-          'shippingCompany',
+          'warehouse',
+          'countryOrigin',
+          'pickupAddress',
+          'orderItems',
+          'orderItems.warehouseItem',
         ],
       });
 
       return {
-        message: 'Order created successfully',
+        message: 'Order created successfully with pending status',
         result: completeOrder,
       };
     } catch (error) {
       if (
-        error instanceof ConflictException ||
         error instanceof NotFoundException ||
         error instanceof BadRequestException
       ) {
@@ -166,4 +194,3 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
     }
   }
 }
-

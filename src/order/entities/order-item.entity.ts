@@ -7,31 +7,39 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { OrderPackageEntity } from './order-package.entity';
+import { OrderEntity } from './order.entity';
+import { WarehouseItemEntity } from '../../warehouse-item/entities/warehouse-item.entity';
 
 @Entity('order_items')
 export class OrderItemEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  name: string;
+  @Column({ name: 'order_id' })
+  orderId: string;
+
+  @ManyToOne(() => OrderEntity, (order) => order.orderItems)
+  @JoinColumn({ name: 'order_id' })
+  order: OrderEntity;
+
+  @Column({ name: 'warehouse_item_id' })
+  warehouseItemId: string;
+
+  @ManyToOne(() => WarehouseItemEntity)
+  @JoinColumn({ name: 'warehouse_item_id' })
+  warehouseItem: WarehouseItemEntity;
 
   @Column({ type: 'int' })
   quantity: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  weight: number;
+  @Column({ name: 'unit_price', type: 'decimal', precision: 10, scale: 2 })
+  unitPrice: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  price: number;
+  @Column({ name: 'total_price', type: 'decimal', precision: 10, scale: 2 })
+  totalPrice: number;
 
-  @Column({ name: 'package_id' })
-  packageId: string;
-
-  @ManyToOne(() => OrderPackageEntity, (orderPackage) => orderPackage.items)
-  @JoinColumn({ name: 'package_id' })
-  orderPackage: OrderPackageEntity;
+  @Column({ name: 'total_weight', type: 'decimal', precision: 10, scale: 2 })
+  totalWeight: number;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
@@ -39,4 +47,3 @@ export class OrderItemEntity {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }
-

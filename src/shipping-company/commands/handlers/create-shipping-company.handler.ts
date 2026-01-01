@@ -2,10 +2,11 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ShippingCompanyEntity } from '../../entities/shipping-company.entity';
+import { WarehouseEntity } from '../../../warehouse/entities/warehouse.entity';
 import { CreateShippingCompanyCommand } from '../impl/create-shipping-company.command';
 import {
   BadRequestException,
-  ConflictException,
+  NotFoundException,
   InternalServerErrorException,
 } from '@nestjs/common';
 
@@ -16,11 +17,23 @@ export class CreateShippingCompanyHandler
   constructor(
     @InjectRepository(ShippingCompanyEntity)
     private readonly shippingCompanyRepo: Repository<ShippingCompanyEntity>,
+    @InjectRepository(WarehouseEntity)
+    private readonly warehouseRepo: Repository<WarehouseEntity>,
   ) {}
 
   async execute(command: CreateShippingCompanyCommand) {
     try {
       const { dto } = command;
+
+      // Verify warehouse exists
+      const warehouse = await this.warehouseRepo.findOne({
+        where: { id: dto.warehouseId },
+      });
+      if (!warehouse) {
+        throw new NotFoundException(
+          `Warehouse with ID "${dto.warehouseId}" not found`,
+        );
+      }
 
       const shippingCompany = this.shippingCompanyRepo.create(dto);
       const saved = await this.shippingCompanyRepo.save(shippingCompany);
@@ -31,7 +44,7 @@ export class CreateShippingCompanyHandler
       };
     } catch (error) {
       if (
-        error instanceof ConflictException ||
+        error instanceof NotFoundException ||
         error instanceof BadRequestException
       ) {
         throw error;

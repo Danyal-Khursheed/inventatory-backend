@@ -1,15 +1,10 @@
 import {
   Body,
   Controller,
-  Delete,
-  Get,
-  ParseUUIDPipe,
-  Patch,
   Post,
-  Query,
   UseGuards,
 } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CommandBus } from '@nestjs/cqrs';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -19,27 +14,21 @@ import {
 import { RolesGuard } from 'src/middlewares/roles.gaurd';
 import { CreateOrderCommand } from './commands/impl/create-order.command';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { GetAllOrdersQuery } from './queries/impl/get-all-orders.query';
-import { GetSingleOrderQuery } from './queries/impl/get-single-order.query';
-import { DeleteOrderCommand } from './commands/impl/delete-order.command';
-import { UpdateOrderDto } from './dto/update-order.dto';
-import { UpdateOrderCommand } from './commands/impl/update-order.command';
+import { SubmitOrderCommand } from './commands/impl/submit-order.command';
+import { SubmitOrderDto } from './dto/submit-order.dto';
 
 @Controller('orders')
 export class OrderController {
-  constructor(
-    private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
-  ) {}
+  constructor(private readonly commandBus: CommandBus) {}
 
   @UseGuards(RolesGuard)
   @ApiBearerAuth()
   @Post('create-order')
-  @ApiOperation({ summary: 'Create a new order' })
+  @ApiOperation({ summary: 'Create a new order with pending status' })
   @ApiBody({ type: CreateOrderDto })
   @ApiResponse({
     status: 201,
-    description: 'Order created successfully',
+    description: 'Order created successfully with pending status',
   })
   async createOrder(@Body() dto: CreateOrderDto): Promise<any> {
     return await this.commandBus.execute(new CreateOrderCommand(dto));
@@ -47,44 +36,14 @@ export class OrderController {
 
   @UseGuards(RolesGuard)
   @ApiBearerAuth()
-  @Get('get-all-orders')
-  async getAllOrders(
-    @Query('pageNumber') pageNumber?: string,
-    @Query('pageSize') pageSize?: string,
-  ) {
-    const page = pageNumber ? parseInt(pageNumber, 10) : undefined;
-    const size = pageSize ? parseInt(pageSize, 10) : undefined;
-    return await this.queryBus.execute(new GetAllOrdersQuery(page, size));
-  }
-
-  @UseGuards(RolesGuard)
-  @ApiBearerAuth()
-  @Get('get-single-order')
-  async getSingleOrder(@Query('id', new ParseUUIDPipe()) id: string) {
-    return await this.queryBus.execute(new GetSingleOrderQuery(id));
-  }
-
-  @UseGuards(RolesGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'update order' })
-  @ApiBody({ type: UpdateOrderDto })
+  @Post('submit-order')
+  @ApiOperation({ summary: 'Submit order with shipping company (confirms order)' })
+  @ApiBody({ type: SubmitOrderDto })
   @ApiResponse({
     status: 200,
-    description: 'Order updated successfully',
+    description: 'Order submitted and confirmed successfully',
   })
-  @Patch('update-order')
-  async updateOrder(
-    @Query('id', new ParseUUIDPipe()) id: string,
-    @Body() dto: UpdateOrderDto,
-  ): Promise<any> {
-    return this.commandBus.execute(new UpdateOrderCommand(id, dto));
-  }
-
-  @UseGuards(RolesGuard)
-  @ApiBearerAuth()
-  @Delete('delete-order')
-  async deleteOrder(@Query('id', new ParseUUIDPipe()) id: string) {
-    return await this.commandBus.execute(new DeleteOrderCommand(id));
+  async submitOrder(@Body() dto: SubmitOrderDto): Promise<any> {
+    return await this.commandBus.execute(new SubmitOrderCommand(dto));
   }
 }
-

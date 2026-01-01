@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsLatitude,
   IsLongitude,
+  IsUUID,
   Length,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -96,4 +97,9 @@ export class CreateCompanyOriginDto {
   @IsString()
   @IsNotEmpty()
   mobileNo: string;
+
+  @ApiProperty()
+  @IsUUID()
+  @IsNotEmpty()
+  warehouseId: string;
 }

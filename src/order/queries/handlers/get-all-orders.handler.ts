@@ -36,12 +36,12 @@ export class GetAllOrdersHandler implements IQueryHandler<GetAllOrdersQuery> {
 
         const [orders, totalCount] = await this.orderRepo.findAndCount({
           relations: [
-            'packages',
-            'packages.items',
-            'receiver',
-            'sender',
-            'senderAddress',
+            'warehouse',
+            'countryOrigin',
+            'pickupAddress',
             'shippingCompany',
+            'orderItems',
+            'orderItems.warehouseItem',
           ],
           skip: (pageNumber - 1) * pageSize,
           take: pageSize,
@@ -58,12 +58,12 @@ export class GetAllOrdersHandler implements IQueryHandler<GetAllOrdersQuery> {
 
       const orders = await this.orderRepo.find({
         relations: [
-          'packages',
-          'packages.items',
-          'receiver',
-          'sender',
-          'senderAddress',
+          'warehouse',
+          'countryOrigin',
+          'pickupAddress',
           'shippingCompany',
+          'orderItems',
+          'orderItems.warehouseItem',
         ],
         order: { createdAt: 'DESC' },
       });

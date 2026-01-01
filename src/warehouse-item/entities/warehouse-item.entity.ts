@@ -17,14 +17,11 @@ export class WarehouseItemEntity {
   @Column()
   name: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  price: number;
+  @Column({ name: 'price_per_item', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  pricePerItem: number;
 
   @Column({ type: 'int' })
   quantity: number;
-
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  weight: number;
 
   @Column({ name: 'warehouse_id' })
   warehouseId: string;
