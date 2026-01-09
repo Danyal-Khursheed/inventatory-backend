@@ -28,6 +28,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { DeleteOrderCommand } from './commands/impl/delete-order.command';
 import { GetAllOrdersQuery } from './queries/impl/get-all-orders.query';
 import { GetSingleOrderQuery } from './queries/impl/get-single-order.query';
+import { GetOrderStatisticsQuery } from './queries/impl/get-order-statistics.query';
 
 @Controller('orders')
 export class OrderController {
@@ -88,6 +89,18 @@ export class OrderController {
         paymentStatus,
       ),
     );
+  }
+
+  @UseGuards(RolesGuard)
+  @ApiBearerAuth()
+  @Get('statistics/overview')
+  @ApiOperation({ summary: 'Get dashboard statistics overview' })
+  @ApiResponse({
+    status: 200,
+    description: 'Statistics retrieved successfully',
+  })
+  async getOrderStatistics(): Promise<any> {
+    return await this.queryBus.execute(new GetOrderStatisticsQuery());
   }
 
   @UseGuards(RolesGuard)
