@@ -15,9 +15,18 @@ export class GetAllOrdersHandler implements IQueryHandler<GetAllOrdersQuery> {
     private orderRepo: Repository<OrderEntity>,
   ) {}
 
-  async execute({ pageNumber, pageSize }: GetAllOrdersQuery): Promise<any> {
+  async execute({ pageNumber, pageSize, orderStatus, paymentStatus }: GetAllOrdersQuery): Promise<any> {
     try {
       const isPaginated = !!(pageNumber && pageSize);
+
+      // Build where clause for filtering
+      const where: any = {};
+      if (orderStatus) {
+        where.orderStatus = orderStatus;
+      }
+      if (paymentStatus) {
+        where.paymentStatus = paymentStatus;
+      }
 
       if (isPaginated) {
         if (pageNumber < 1) {
@@ -35,6 +44,7 @@ export class GetAllOrdersHandler implements IQueryHandler<GetAllOrdersQuery> {
         }
 
         const [orders, totalCount] = await this.orderRepo.findAndCount({
+          where,
           relations: [
             'warehouse',
             'countryOrigin',
@@ -57,6 +67,7 @@ export class GetAllOrdersHandler implements IQueryHandler<GetAllOrdersQuery> {
       }
 
       const orders = await this.orderRepo.find({
+        where,
         relations: [
           'warehouse',
           'countryOrigin',

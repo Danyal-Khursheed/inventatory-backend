@@ -26,7 +26,7 @@ import { PickupAddressEntity } from '../pickup-address/entities/pickup-address.e
     ]),
   ],
   controllers: [OrderController],
-  providers: [...commandHandlers],
+  providers: [...commandHandlers, ...queryHandlers],
 })
 export class OrderModule {}
 
