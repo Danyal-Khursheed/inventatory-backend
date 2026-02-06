@@ -5,6 +5,7 @@
 
 # Logs
 logs
+/iisnode
 *.log
 npm-debug.log*
 pnpm-debug.log*
