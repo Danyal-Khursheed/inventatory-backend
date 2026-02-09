@@ -4,9 +4,22 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ValidationError } from 'class-validator';
+import * as fs from 'fs';
+import * as https from 'https';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const useHttps = process.env.USE_HTTPS === 'true';
+  const httpsOptions = useHttps
+    ? {
+        cert: fs.readFileSync(process.env.HTTPS_CERT_PATH || './certs/cert.pem'),
+        key: fs.readFileSync(process.env.HTTPS_KEY_PATH || './certs/key.pem'),
+      }
+    : undefined;
+
+  const app = await NestFactory.create(AppModule, {
+    cors: true,
+    httpsOptions,
+  });
 
   app.setGlobalPrefix('api');
 
@@ -54,7 +67,22 @@ async function bootstrap() {
       },
     }),
   );
+
   const port = process.env.PORT ?? 8000;
-  await app.listen(port);
+  const host = process.env.SERVER_HOST || 'localhost';
+  const protocol = useHttps ? 'https' : 'http';
+  
+  await app.listen(port, host, () => {
+    console.log(`
+    ╔═══════════════════════════════════════════════════════════╗
+    ║  Inventory Management API - NestJS Backend                ║
+    ╠═══════════════════════════════════════════════════════════╣
+    ║  Server: ${protocol.toUpperCase()}://${process.env.SERVER_HOST || 'localhost'}:${port}             ║
+    ║  Environment: ${(process.env.NODE_ENV || 'development').padEnd(43)}║
+    ║  Swagger UI: ${protocol}://${process.env.SERVER_HOST || 'localhost'}:${port}/api     ║
+    ╚═══════════════════════════════════════════════════════════╝
+    `);
+  });
 }
+
 bootstrap();
