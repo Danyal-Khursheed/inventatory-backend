@@ -1,11 +1,28 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber, IsUUID, IsOptional, Min } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsUUID,
+  IsOptional,
+  Min,
+} from 'class-validator';
 
 export class CreateWarehouseItemDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  sku?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  upc?: string;
 
   @ApiProperty()
   @IsNumber()
