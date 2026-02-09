@@ -8,6 +8,16 @@ export class UpdateWarehouseItemDto {
   name?: string;
 
   @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  sku?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  upc?: string;
+
+  @ApiProperty({ required: false })
   @IsNumber()
   @IsOptional()
   @Min(0, { message: 'pricePerItem must be greater than or equal to 0' })
