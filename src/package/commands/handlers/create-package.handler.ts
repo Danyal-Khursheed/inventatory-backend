@@ -3,6 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PackageEntity } from '../../entities/package.entity';
 import { CreatePackageCommand } from '../impl/create-package.command';
+import {
+  BadRequestException,
+  ConflictException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 @CommandHandler(CreatePackageCommand)
 export class CreatePackageHandler
@@ -14,11 +19,43 @@ export class CreatePackageHandler
   ) {}
 
   async execute(command: CreatePackageCommand) {
-    const { dto } = command;
+    try {
+      const { dto } = command;
 
-    const pkg = this.packageRepo.create(dto);
-    await this.packageRepo.save(pkg);
+      // Check if SKU already exists
+      const existingSku = await this.packageRepo.findOne({
+        where: { sku: dto.sku },
+      });
+      if (existingSku) {
+        throw new ConflictException(
+          `Package with SKU "${dto.sku}" already exists`,
+        );
+      }
 
-    return { message: 'Package created', result: pkg };
+      // Check if UPC already exists
+      const existingUpc = await this.packageRepo.findOne({
+        where: { upc: dto.upc },
+      });
+      if (existingUpc) {
+        throw new ConflictException(
+          `Package with UPC "${dto.upc}" already exists`,
+        );
+      }
+
+      const pkg = this.packageRepo.create(dto);
+      const savedPackage = await this.packageRepo.save(pkg);
+
+      return { message: 'Package created successfully', result: savedPackage };
+    } catch (error) {
+      if (
+        error instanceof ConflictException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `Failed to create package: ${error.message}`,
+      );
+    }
   }
 }

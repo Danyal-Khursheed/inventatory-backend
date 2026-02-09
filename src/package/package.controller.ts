@@ -24,6 +24,8 @@ import { GetSinglePackageQuery } from './queries/impl/get-single-package';
 import { DeletePackageCommand } from './commands/impl/delete-package.command';
 import { UpdatePackageDto } from './dto/update-package.dto';
 import { UpdatePackageCommand } from './commands/impl/update-package.command';
+import { CreateBulkPackageDTO } from './dto/create-bulk-package';
+import { CreatePackageBulkCommand } from './commands/impl/create-package-bulk.command';
 
 @Controller('packages')
 export class PackagesController {
@@ -49,6 +51,25 @@ export class PackagesController {
   })
   async createPackage(@Body() dto: CreatePackageDto): Promise<any> {
     return await this.commandBus.execute(new CreatePackageCommand(dto));
+  }
+
+  @UseGuards(RolesGuard)
+  @ApiBearerAuth()
+  @Post('create-package-bulk')
+  @ApiOperation({ summary: 'Create new packages in bulk' })
+  @ApiBody({ type: CreateBulkPackageDTO })
+  @ApiResponse({
+    status: 201,
+    description: 'Package created successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Package created' },
+      },
+    },
+  })
+  async createPackageBulk(@Body() dto: CreateBulkPackageDTO): Promise<any> {
+    return await this.commandBus.execute(new CreatePackageBulkCommand(dto));
   }
 
   @UseGuards(RolesGuard)
@@ -94,7 +115,7 @@ export class PackagesController {
 
   @UseGuards(RolesGuard)
   @ApiBearerAuth()
-  @Delete('get-single-package')
+  @Delete('delete-package')
   async deletePackage(@Query('id', new ParseUUIDPipe()) id: string) {
     return await this.commandBus.execute(new DeletePackageCommand(id));
   }
