@@ -2,6 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderEntity } from '../../entities/order.entity';
+import { OrderItemEntity } from '../../entities/order-item.entity';
 import { DeleteOrderCommand } from '../impl/delete-order.command';
 import {
   NotFoundException,
@@ -13,6 +14,8 @@ export class DeleteOrderHandler implements ICommandHandler<DeleteOrderCommand> {
   constructor(
     @InjectRepository(OrderEntity)
     private readonly orderRepo: Repository<OrderEntity>,
+    @InjectRepository(OrderItemEntity)
+    private readonly orderItemRepo: Repository<OrderItemEntity>,
   ) {}
 
   async execute(command: DeleteOrderCommand) {
@@ -24,6 +27,7 @@ export class DeleteOrderHandler implements ICommandHandler<DeleteOrderCommand> {
         throw new NotFoundException(`Order with ID "${id}" not found`);
       }
 
+      await this.orderItemRepo.delete({ orderId: id });
       await this.orderRepo.remove(order);
 
       return { message: 'Order deleted successfully' };

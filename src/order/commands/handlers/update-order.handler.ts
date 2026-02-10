@@ -83,13 +83,29 @@ export class UpdateOrderHandler implements ICommandHandler<UpdateOrderCommand> {
       }
 
       // Update order fields
-      if (dto.warehouseId) order.warehouseId = dto.warehouseId;
-      if (dto.countryOriginId) order.countryOriginId = dto.countryOriginId;
-      if (dto.pickupAddressId) order.pickupAddressId = dto.pickupAddressId;
-      if (dto.shippingCompanyId) order.shippingCompanyId = dto.shippingCompanyId;
-      if (dto.orderStatus) order.orderStatus = dto.orderStatus;
-      if (dto.paymentStatus) order.paymentStatus = dto.paymentStatus;
-      if (dto.deliveryDate) order.deliveryDate = new Date(dto.deliveryDate);
+      if (dto.warehouseId !== undefined) order.warehouseId = dto.warehouseId;
+      if (dto.countryOriginId !== undefined) order.countryOriginId = dto.countryOriginId;
+      if (dto.pickupAddressId !== undefined) order.pickupAddressId = dto.pickupAddressId;
+      if (dto.receiver !== undefined) {
+        order.receiverName = dto.receiver.name;
+        order.receiverCompanyName = dto.receiver.companyName ?? null;
+        order.receiverEmail = dto.receiver.email ?? null;
+        order.receiverMobileNo = dto.receiver.mobileNo;
+      }
+      if (dto.cod !== undefined) order.cod = dto.cod;
+      if (dto.referenceId !== undefined) order.referenceId = dto.referenceId;
+      if (dto.codAmount !== undefined) order.codAmount = dto.codAmount;
+      if (dto.instructions !== undefined) order.instructions = dto.instructions;
+      if (dto.box !== undefined) {
+        order.boxLength = dto.box.length;
+        order.boxWidth = dto.box.width;
+        order.boxHeight = dto.box.height;
+        order.volumetricWeight = dto.box.volumetricWeight;
+      }
+      if (dto.shippingCompanyId !== undefined) order.shippingCompanyId = dto.shippingCompanyId;
+      if (dto.orderStatus !== undefined) order.orderStatus = dto.orderStatus;
+      if (dto.paymentStatus !== undefined) order.paymentStatus = dto.paymentStatus;
+      if (dto.deliveryDate !== undefined) order.deliveryDate = new Date(dto.deliveryDate);
 
       const updatedOrder = await this.orderRepo.save(order);
 

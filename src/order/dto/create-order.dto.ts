@@ -1,14 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsString,
   IsNotEmpty,
   IsUUID,
   IsArray,
   IsNumber,
   IsOptional,
+  IsBoolean,
+  IsString,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ReceiverDto } from './receiver.dto';
+import { BoxDto } from './box.dto';
 
 export class OrderItemInputDto {
   @ApiProperty()
@@ -47,6 +50,36 @@ export class CreateOrderDto {
   @IsUUID()
   @IsNotEmpty()
   pickupAddressId: string;
+
+  @ApiProperty({ type: ReceiverDto })
+  @ValidateNested()
+  @Type(() => ReceiverDto)
+  receiver: ReceiverDto;
+
+  @ApiProperty({ default: false })
+  @IsBoolean()
+  cod: boolean;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  referenceId?: string;
+
+  @ApiProperty({ required: false, default: 0 })
+  @IsNumber()
+  @IsOptional()
+  codAmount?: number;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  instructions?: string;
+
+  @ApiProperty({ type: BoxDto, required: false })
+  @ValidateNested()
+  @Type(() => BoxDto)
+  @IsOptional()
+  box?: BoxDto;
 
   @ApiProperty({ type: [OrderItemInputDto] })
   @IsArray()

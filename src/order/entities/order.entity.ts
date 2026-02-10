@@ -40,6 +40,42 @@ export class OrderEntity {
   @JoinColumn({ name: 'pickup_address_id' })
   pickupAddress: PickupAddressEntity;
 
+  @Column({ name: 'receiver_name', type: 'varchar', nullable: true })
+  receiverName: string | null;
+
+  @Column({ name: 'receiver_company_name', type: 'varchar', nullable: true })
+  receiverCompanyName: string | null;
+
+  @Column({ name: 'receiver_email', type: 'varchar', nullable: true })
+  receiverEmail: string | null;
+
+  @Column({ name: 'receiver_mobile_no', type: 'varchar', nullable: true })
+  receiverMobileNo: string | null;
+
+  @Column({ name: 'cod', type: 'boolean', default: false })
+  cod: boolean;
+
+  @Column({ name: 'reference_id', type: 'varchar', nullable: true })
+  referenceId: string | null;
+
+  @Column({ name: 'cod_amount', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  codAmount: number | null;
+
+  @Column({ name: 'instructions', type: 'text', nullable: true })
+  instructions: string | null;
+
+  @Column({ name: 'box_length', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  boxLength: number | null;
+
+  @Column({ name: 'box_width', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  boxWidth: number | null;
+
+  @Column({ name: 'box_height', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  boxHeight: number | null;
+
+  @Column({ name: 'volumetric_weight', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  volumetricWeight: number | null;
+
   @Column({ name: 'shipping_company_id', nullable: true })
   shippingCompanyId: string;
 
