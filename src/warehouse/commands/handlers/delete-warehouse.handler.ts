@@ -21,7 +21,15 @@ export class DeleteWarehouseHandler
     try {
       const { id } = command;
 
-      const warehouse = await this.warehouseRepo.findOne({ where: { id } });
+      const warehouse = await this.warehouseRepo.findOne({
+        where: { id },
+        relations: [
+          'pickupAddresses',
+          'warehouseItems',
+          'shippingCompanies',
+          'countryOrigins',
+        ],
+      });
       if (!warehouse) {
         throw new NotFoundException(`Warehouse with ID "${id}" not found`);
       }

@@ -51,7 +51,9 @@ export class CompanyOrigin {
   @Column({ name: 'warehouse_id', nullable: true })
   warehouseId: string;
 
-  @ManyToOne(() => WarehouseEntity, (warehouse) => warehouse.countryOrigins)
+  @ManyToOne(() => WarehouseEntity, (warehouse) => warehouse.countryOrigins,{
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'warehouse_id' })
   warehouse: WarehouseEntity;
 

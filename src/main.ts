@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { SnakeToCamelBodyInterceptor } from './common/interceptors/snake-to-camel-body.interceptor';
 import { ValidationError } from 'class-validator';
 import * as fs from 'fs';
 import * as https from 'https';
@@ -38,6 +39,9 @@ async function bootstrap() {
 
   app.useGlobalFilters(new HttpExceptionFilter());
 
+  // Mutate request.body to camelCase before ValidationPipe (bulk items etc.)
+  app.useGlobalInterceptors(new SnakeToCamelBodyInterceptor());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -47,18 +51,25 @@ async function bootstrap() {
         enableImplicitConversion: true,
       },
       exceptionFactory: (errors: ValidationError[]) => {
-        // Format validation errors properly
-        const formattedErrors = errors.map((error) => {
-          const constraints = error.constraints
-            ? Object.values(error.constraints)
-            : [];
-          return {
-            property: error.property,
-            value: error.value,
-            constraints: error.constraints || {},
-            messages: constraints,
-          };
-        });
+        const formatError = (err: ValidationError, path = ''): any[] => {
+          const field = path ? `${path}.${err.property}` : err.property;
+          const messages = err.constraints ? Object.values(err.constraints) : [];
+          const out: any[] = [];
+          if (messages.length > 0) {
+            out.push({
+              field,
+              messages,
+              constraints: err.constraints || {},
+            });
+          }
+          if (err.children?.length) {
+            err.children.forEach((c) =>
+              out.push(...formatError(c, field)),
+            );
+          }
+          return out;
+        };
+        const formattedErrors = errors.flatMap((e) => formatError(e));
 
         return new BadRequestException({
           message: 'Validation failed',

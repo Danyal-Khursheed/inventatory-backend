@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsUUID, IsOptional, Min } from 'class-validator';
+import { IsString, IsNumber, IsUUID, IsOptional, Min, IsEnum } from 'class-validator';
+import { ProductCategory } from '../enums/product-category.enum';
 
 export class UpdateWarehouseItemDto {
   @ApiProperty({ required: false })
@@ -39,5 +40,16 @@ export class UpdateWarehouseItemDto {
   @IsUUID()
   @IsOptional()
   warehouseId?: string;
+
+  @ApiProperty({ enum: ProductCategory, required: false })
+  @IsEnum(ProductCategory)
+  @IsOptional()
+  productCategory?: ProductCategory;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  @Min(0, { message: 'retrnxboxDamaged must be greater than or equal to 0' })
+  retrnxboxDamaged?: number;
 }
 

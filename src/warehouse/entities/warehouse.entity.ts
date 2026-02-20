@@ -31,16 +31,16 @@ export class WarehouseEntity {
   @Column({ name: 'country_code', length: 2, nullable: true })
   countryCode: string;
 
-  @OneToMany(() => WarehouseItemEntity, (warehouseItem) => warehouseItem.warehouse)
+  @OneToMany(() => WarehouseItemEntity, (warehouseItem) => warehouseItem.warehouse,{cascade:true})
   warehouseItems: WarehouseItemEntity[];
 
-  @OneToMany(() => PickupAddressEntity, (pickupAddress) => pickupAddress.warehouse)
+  @OneToMany(() => PickupAddressEntity, (pickupAddress) => pickupAddress.warehouse,{cascade:true})
   pickupAddresses: PickupAddressEntity[];
 
-  @OneToMany(() => ShippingCompanyEntity, (shippingCompany) => shippingCompany.warehouse)
+  @OneToMany(() => ShippingCompanyEntity, (shippingCompany) => shippingCompany.warehouse,{cascade:true})
   shippingCompanies: ShippingCompanyEntity[];
 
-  @OneToMany(() => CompanyOrigin, (countryOrigin) => countryOrigin.warehouse)
+  @OneToMany(() => CompanyOrigin, (countryOrigin) => countryOrigin.warehouse ,{cascade:true})
   countryOrigins: CompanyOrigin[];
 
   @CreateDateColumn({ name: 'created_at' })

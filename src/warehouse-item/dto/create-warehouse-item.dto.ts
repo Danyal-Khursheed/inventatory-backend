@@ -6,7 +6,9 @@ import {
   IsUUID,
   IsOptional,
   Min,
+  IsEnum,
 } from 'class-validator';
+import { ProductCategory } from '../enums/product-category.enum';
 
 export class CreateWarehouseItemDto {
   @ApiProperty()
@@ -44,5 +46,16 @@ export class CreateWarehouseItemDto {
   @IsUUID()
   @IsNotEmpty()
   warehouseId: string;
+
+  @ApiProperty({ enum: ProductCategory, required: false })
+  @IsEnum(ProductCategory)
+  @IsOptional()
+  productCategory?: ProductCategory;
+
+  @ApiProperty({ required: false, default: 0 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0, { message: 'retrnxboxDamaged must be greater than or equal to 0' })
+  retrnxboxDamaged?: number;
 }
 

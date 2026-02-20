@@ -44,7 +44,9 @@ export class PickupAddressEntity {
   @Column({ name: 'warehouse_id', nullable: true })
   warehouseId: string;
 
-  @ManyToOne(() => WarehouseEntity, (warehouse) => warehouse.pickupAddresses)
+  @ManyToOne(() => WarehouseEntity, (warehouse) => warehouse.pickupAddresses, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'warehouse_id' })
   warehouse: WarehouseEntity;
 

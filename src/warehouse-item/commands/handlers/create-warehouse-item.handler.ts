@@ -42,6 +42,8 @@ export class CreateWarehouseItemHandler
         weightPerItem: dto.weightPerItem,
         quantity: dto.quantity,
         warehouseId: dto.warehouseId,
+        productCategory: dto.productCategory ?? null,
+        retrnxboxDamaged: dto.retrnxboxDamaged ?? 0,
       });
       const savedWarehouseItem = await this.warehouseItemRepo.save(warehouseItem);
 

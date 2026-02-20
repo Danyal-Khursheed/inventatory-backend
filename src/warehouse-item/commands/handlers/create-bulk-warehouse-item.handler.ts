@@ -53,8 +53,9 @@ export class CreateBulkWarehouseItemHandler
       const savedItems = await this.warehouseItemRepo.save(warehouseItems);
 
       return {
+        success: true,
         message: `Successfully created ${savedItems.length} warehouse item(s)`,
-        result: savedItems,
+        data: savedItems,
         count: savedItems.length,
       };
     } catch (error) {
