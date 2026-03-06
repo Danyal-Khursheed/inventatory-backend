@@ -2,20 +2,16 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsUUID,
   Length,
-  IsInt,
-  Min,
-  Max,
 } from 'class-validator';
 
 export class CreatePickupAddressDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  address_nick: string;
+  addressNick: string;
 
   @ApiProperty()
   @IsString()
@@ -25,13 +21,13 @@ export class CreatePickupAddressDto {
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  zip_code?: string;
+  zipCode?: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   @Length(1, 20)
-  mobile_no: string;
+  mobileNo: string;
 
   @ApiProperty()
   @IsString()
@@ -46,22 +42,21 @@ export class CreatePickupAddressDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  city_name: string;
+  cityName: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  country_name: string;
+  countryName: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   @Length(2, 2)
-  country_code: string;
+  countryCode: string;
 
   @ApiProperty()
   @IsUUID()
   @IsNotEmpty()
-  warehouse_id: string;
+  warehouseId: string;
 }
-

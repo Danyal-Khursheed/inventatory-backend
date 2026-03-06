@@ -33,26 +33,26 @@ export class UpdatePickupAddressHandler
 
     const updateData: Partial<PickupAddressEntity> = {};
     
-    if (dto.address_nick !== undefined) updateData.addressNick = dto.address_nick;
+    if (dto.addressNick !== undefined) updateData.addressNick = dto.addressNick;
     if (dto.address !== undefined) updateData.address = dto.address;
-    if (dto.zip_code !== undefined) updateData.zipCode = dto.zip_code;
-    if (dto.mobile_no !== undefined) updateData.mobileNo = dto.mobile_no;
+    if (dto.zipCode !== undefined) updateData.zipCode = dto.zipCode;
+    if (dto.mobileNo !== undefined) updateData.mobileNo = dto.mobileNo;
     if (dto.latitude !== undefined) updateData.latitude = dto.latitude;
     if (dto.longitude !== undefined) updateData.longitude = dto.longitude;
-    if (dto.city_name !== undefined) updateData.cityName = dto.city_name;
-    if (dto.country_name !== undefined) updateData.countryName = dto.country_name;
-    if (dto.country_code !== undefined) updateData.countryCode = dto.country_code;
-    if (dto.warehouse_id !== undefined) {
+    if (dto.cityName !== undefined) updateData.cityName = dto.cityName;
+    if (dto.countryName !== undefined) updateData.countryName = dto.countryName;
+    if (dto.countryCode !== undefined) updateData.countryCode = dto.countryCode;
+    if (dto.warehouseId !== undefined) {
       // Verify warehouse exists if being updated
       const warehouse = await this.warehouseRepo.findOne({
-        where: { id: dto.warehouse_id },
+        where: { id: dto.warehouseId },
       });
       if (!warehouse) {
         throw new NotFoundException(
-          `Warehouse with ID "${dto.warehouse_id}" not found`,
+          `Warehouse with ID "${dto.warehouseId}" not found`,
         );
       }
-      updateData.warehouseId = dto.warehouse_id;
+      updateData.warehouseId = dto.warehouseId;
     }
 
     Object.assign(pickupAddress, updateData);

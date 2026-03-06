@@ -26,25 +26,25 @@ export class CreatePickupAddressHandler
 
       // Verify warehouse exists
       const warehouse = await this.warehouseRepo.findOne({
-        where: { id: dto.warehouse_id },
+        where: { id: dto.warehouseId },
       });
       if (!warehouse) {
         throw new NotFoundException(
-          `Warehouse with ID "${dto.warehouse_id}" not found`,
+          `Warehouse with ID "${dto.warehouseId}" not found`,
         );
       }
 
       const pickupAddress = this.pickupAddressRepo.create({
-        addressNick: dto.address_nick,
+        addressNick: dto.addressNick,
         address: dto.address,
-        zipCode: dto.zip_code,
-        mobileNo: dto.mobile_no,
+        zipCode: dto.zipCode,
+        mobileNo: dto.mobileNo,
         latitude: dto.latitude,
         longitude: dto.longitude,
-        cityName: dto.city_name,
-        countryName: dto.country_name,
-        countryCode: dto.country_code,
-        warehouseId: dto.warehouse_id,
+        cityName: dto.cityName,
+        countryName: dto.countryName,
+        countryCode: dto.countryCode,
+        warehouseId: dto.warehouseId,
       });
 
       await this.pickupAddressRepo.save(pickupAddress);
